@@ -95,11 +95,17 @@ public:
     }
 
     String getWeatherString(int index) {
-        if (index < 0 || index >= items) return "No data available.";
-        return ("{index:" + String(index) + ",temp:" + String((int) weather[index].tempBeforePoint) + "." + String((int) weather[index].tempAfterPoint) +
-            ",hum:" + String((int) weather[index].humBeforePoint) + "." + String((int) weather[index].humAfterPoint) +
-            ",time:" + String(weather[index].time) + "}");
+      if (index < 0 || index >= items) return "No data available.";
+        // Ensure two decimal places by padding with leading zero if necessary
+        String tempAfterPointStr = (weather[index].tempAfterPoint < 10) ? "0" + String((int) weather[index].tempAfterPoint) : String((int) weather[index].tempAfterPoint);
+        String humAfterPointStr = (weather[index].humAfterPoint < 10) ? "0" + String((int) weather[index].humAfterPoint) : String((int) weather[index].humAfterPoint);
+
+        return ("{index:" + String(index) + 
+                ",temp:" + String((int) weather[index].tempBeforePoint) + "." + tempAfterPointStr +
+                ",hum:" + String((int) weather[index].humBeforePoint) + "." + humAfterPointStr +
+                ",time:" + String(weather[index].time) + "}");
     }
+
 
     // Shouldn't be used as it will occupy all the memory
     String toString() {

@@ -1,7 +1,6 @@
 import requests as rq
 from datetime import datetime, timedelta
 import pandas as pd
-import sys
 from PIL import Image
 
 class WeatherData:

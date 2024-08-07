@@ -108,6 +108,7 @@ public:
 
 
     // Shouldn't be used as it will occupy all the memory
+    /*
     String toString() {
         String str = "\n--VECTOR--\n";
         if(firstItemP < 0 && lastItemP < 0) return str;
@@ -133,6 +134,8 @@ public:
         str += "--VECTOR--\n";
         return str;
     }
+    */
+    
 
     void sendWeather(void (*sendFunc)(const String &)){
       if(firstItemP < 0 && lastItemP < 0) {

@@ -129,7 +129,7 @@ void loop(void) {
   timeClient.update();
   aht.getEvent(&humidity, &temp);  
 
-  int actualMin = timeClient.getSeconds();
+  int actualMin = timeClient.getMinutes();
   if((actualMin > lastMin || actualMin < lastMin) && actualMin%10 == lastMin%10){
     lastMin = actualMin;
     weatherVector->addWeather(temp.temperature, humidity.relative_humidity, timeClient.getEpochTime());

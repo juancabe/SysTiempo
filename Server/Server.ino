@@ -49,7 +49,7 @@ void handleWeather(){
 }
 
 void handleRoot(){
-  server.send(200, "text/plain", "Hello, world!");
+  server.send(200, "text/plain", BOARD_ID);
 }
 
 void handleNotFound() {
@@ -93,7 +93,7 @@ void setup(void) {
   timeClient.setTimeOffset(2);
 
   // MDNS
-  if (MDNS.begin("esp8266")) { Serial.println("MDNS responder started"); }
+  if (MDNS.begin(BOARD_ID)) { Serial.println("MDNS responder started"); }
 
   // Web Server
   server.on("/", handleRoot);

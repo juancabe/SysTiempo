@@ -46,6 +46,14 @@ void handleWeatherVector() {
 
 void handleWeather(){
   server.send(200, "text/plain", String(temp.temperature) + "," + String(humidity.relative_humidity));
+  Serial.println("Weather requested " + String(temp.temperature) + "," + String(humidity.relative_humidity));
+}
+
+void handleVectorItems(){
+  if(weatherVector == nullptr){
+    server.send(200, "text/plain", "{\"dataItems\":0}");
+  }
+  server.send(200, "text/plain", "{\"dataItems\":" + String(weatherVector->getItems()) + "}");
 }
 
 void handleRoot(){
@@ -132,6 +140,7 @@ void setup(void) {
   // TODO
   server.on("/weatherbyindex", handleWeatherByIndex);
   server.on("/weatherindexesntimes", handleIndexesNTimes);
+  server.on("/weathervectoritems", handleVectorItems);
 
 
   server.onNotFound(handleNotFound);
@@ -162,7 +171,6 @@ void setup(void) {
 void loop(void) {
   timeClient.update();
   aht.getEvent(&humidity, &temp);  
-
   int actualMin = timeClient.getMinutes();
   if((actualMin > lastMin || actualMin < lastMin) && actualMin%10 == lastMin%10){
     lastMin = actualMin;

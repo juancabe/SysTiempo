@@ -16,7 +16,7 @@
 #define STAPSK "YOUR_PASS"
 #endif
 
-WeatherVector * weatherVector;
+WeatherVector * weatherVector = nullptr;
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
@@ -67,6 +67,36 @@ void handleNotFound() {
   digitalWrite(led, 0);
 }
 
+void handleWeatherByIndex(){
+  if(weatherVector == nullptr){
+      server.send(200, "text/plain", "No vector loaded.");
+      return;
+      }
+  if(server.args() == 0){
+    server.send(200, "text/plain", "No index provided.");
+    return;
+  }
+
+  int index = server.arg(0).toInt();
+  if(weatherVector == nullptr){
+    server.send(200, "text/plain", "No vector loaded.");
+  } else{
+    server.send(200, "text/plain", weatherVector->getWeatherString(index));
+  }
+}
+
+void handleIndexesNTimes(){
+  String str;
+  if(weatherVector == nullptr){
+    str = "No vector loaded.";
+  } else{
+    Vector2_2 vec = weatherVector->getAvailableIndexesNTimes();
+    str = "{\"first\":{\"index\":" + String(vec.x.x) + ",\"time\":" + String(vec.x.y) + "},";
+    str += "\"last\":{\"index\":" + String(vec.y.x) + ",\"time\":" + String(vec.y.y) + "}}"; 
+  }
+  server.send(200, "text/plain", str);
+}
+
 int lastMin = -1;
 void setup(void) {
  
@@ -99,6 +129,10 @@ void setup(void) {
   server.on("/", handleRoot);
   server.on("/weather", handleWeather);
   server.on("/weathervector", handleWeatherVector);
+  // TODO
+  server.on("/weatherbyindex", handleWeatherByIndex);
+  server.on("/weatherindexesntimes", handleIndexesNTimes);
+
 
   server.onNotFound(handleNotFound);
 
@@ -113,7 +147,7 @@ void setup(void) {
   Serial.println("AHT10 found");
 
   // Weather vector
-  auto items = (system_get_free_heap_size() / 4 * 3)/sizeof(Weather);
+  auto items = (system_get_free_heap_size() / 4 * 2)/sizeof(Weather);
   weatherVector = new WeatherVector(items);
   Serial.print("Weather vector size: ");
   Serial.println(items);
@@ -133,16 +167,17 @@ void loop(void) {
   if((actualMin > lastMin || actualMin < lastMin) && actualMin%10 == lastMin%10){
     lastMin = actualMin;
     weatherVector->addWeather(temp.temperature, humidity.relative_humidity, timeClient.getEpochTime());
+    /*
     Weather w = weatherVector->getWeather(weatherVector->getLastItemP());
     Serial.println("Last item | Temp: " + String((int)w.tempBeforePoint) + "." + String((int)w.tempAfterPoint) +
     ", Hum: " + String((int)w.humBeforePoint) + "." + String((int)w.humAfterPoint) +
     ",Time: " + String(w.time));
     Serial.println("Vector last item: " + String(weatherVector->getLastItemP()) + " first item: " + String(weatherVector->getFirstItemP()));
-    //Serial.print(weatherVector->toString());
+    Serial.print(weatherVector->toString());
     weatherVector->sendWeather([](const String &data){
       Serial.println(data);
     });
-    
+    */    
   }
   server.handleClient();
   MDNS.update();

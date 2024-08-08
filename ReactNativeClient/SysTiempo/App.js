@@ -20,16 +20,13 @@ export default function App() {
       {data ? (
         <>
           <Text style={{ color: "#fff" }}>
-            Temperatura fuera: {data.fuera[0].temp}ºC
+            Temperatura: {data[data.length - 1].temp}ºC
           </Text>
           <Text style={{ color: "#fff" }}>
-            Humedad fuera: {data.fuera[0].hum}%
+            Humedad: {data[data.length - 1].hum}%
           </Text>
           <Text style={{ color: "#fff" }}>
-            Temperatura dentro: {data.dentro[0].temp}ºC
-          </Text>
-          <Text style={{ color: "#fff" }}>
-            Humedad dentro: {data.dentro[0].hum}%
+            Última actualización: {new Date(data[data.length - 1].time * 1000).toLocaleString()}
           </Text>
         </>
       ) : (

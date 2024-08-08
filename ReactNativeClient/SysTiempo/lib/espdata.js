@@ -38,7 +38,7 @@ async function findHelloRespondingIPs(Burl) {
 
 export async function getEspData(Burl) {
   let url = "";
-  if (Burl === "esp8266dentro") url = "http://192.168.1.128";
+  if (Burl === "esp8266dentro") url = "http://192.168.1.128"; // TODO: Change this
   else url = "http://" + Burl + ".local";
 
   console.log("Looking for ", Burl, " at:", url);

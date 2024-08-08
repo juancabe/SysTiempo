@@ -1,9 +1,7 @@
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Image, Button } from "react-native";
+import { useState } from "react";
+import { StyleSheet, Text, View, Button } from "react-native";
 import { getEspData } from "./lib/espdata";
-
-const icon = require("./assets/icon.png");
 
 const urlFuera = "esp8266fuera";
 const urlDentro = "esp8266dentro";
@@ -12,66 +10,74 @@ export default function App() {
   const [dataFuera, setDataFuera] = useState(null);
   const [dataDentro, setDataDentro] = useState(null);
 
-  useEffect(() => {
-    getEspData(urlFuera).then((data) => {
-      setDataFuera(data);
-    });
-  }, []);
-
-  useEffect(() => {
-    getEspData(urlDentro).then((data) => {
-      setDataDentro(data);
-    });
-  }, []);
-
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      {dataFuera ? (
-        <>
-          <Text style={{ color: "#fff" }}>Fuera</Text>
-          <Text style={{ color: "#fff" }}>
-            Temperatura: {dataFuera[dataFuera.length - 1].temp}ºC
-          </Text>
-          <Text style={{ color: "#fff" }}>
-            Humedad: {dataFuera[dataFuera.length - 1].hum}%
-          </Text>
-          <Text style={{ color: "#fff" }}>
-            Última actualización:{" "}
-            {new Date(
-              dataFuera[dataFuera.length - 1].time * 1000,
-            ).toLocaleString()}
-          </Text>
-        </>
-      ) : (
-        <Text style={{ color: "#fff" }}>Cargando data fuera...</Text>
-      )}
+
+      {/* Botón para cargar datos de fuera */}
       <Button
-        title="Recargar"
+        title="Cargar Fuera"
         onPress={() => {
-          getEspData(urlDentro).then((data) => {
-            setDataDentro(data);
+          getEspData(urlFuera).then((data) => {
+            setDataFuera(data); // Se actualiza el estado
           });
         }}
       />
-      {dataDentro ? (
+
+      {/* Mostrar datos de fuera */}
+      {dataFuera ? (
         <>
-          <Text style={{ color: "#fff" }}>Dentro</Text>
-          <Text style={{ color: "#fff" }}>
-            Temperatura: {dataDentro[dataDentro.length - 1].temp}ºC
-          </Text>
-          <Text style={{ color: "#fff" }}>
-            Humedad: {dataDentro[dataDentro.length - 1].hum}%
-          </Text>
-          <Text style={{ color: "#fff" }}>
-            Última actualización:{" "}
-            {new Date(
-              dataDentro[dataDentro.length - 1].time * 1000,
-            ).toLocaleString()}
-          </Text>
+          <Text style={[styles.title, { fontWeight: "bold" }]}>Fuera</Text>
+          <View style={{ textAlign: "left" }}>
+            <Text style={[styles.paragraph]}>
+              Temperatura: {dataFuera[dataFuera.length - 1].temp}ºC
+            </Text>
+            <Text style={[styles.paragraph]}>
+              Humedad: {dataFuera[dataFuera.length - 1].hum}%
+            </Text>
+            <Text style={[styles.paragraph]}>
+              Última actualización:{" "}
+              {new Date(
+                dataFuera[dataFuera.length - 1].time * 1000,
+              ).toLocaleString()}
+            </Text>
+          </View>
         </>
       ) : (
-        <Text style={{ color: "#fff" }}>Cargando data dentro...</Text>
+        <Text style={{ color: "#fff" }}>Sin datos de fuera.</Text>
+      )}
+
+      {/* Botón para cargar datos de dentro */}
+      <Button
+        title="Cargar Dentro"
+        onPress={() => {
+          getEspData(urlDentro).then((data) => {
+            setDataDentro(data); // Se actualiza el estado
+          });
+        }}
+      />
+
+      {/* Mostrar datos de dentro */}
+      {dataDentro ? (
+        <>
+          <Text style={[styles.title, { fontWeight: "bold" }]}>Dentro</Text>
+          <View style={{ textAlign: "left" }}>
+            <Text style={[styles.paragraph]}>
+              Temperatura: {dataDentro[dataDentro.length - 1].temp}ºC
+            </Text>
+            <Text style={[styles.paragraph]}>
+              Humedad: {dataDentro[dataDentro.length - 1].hum}%
+            </Text>
+            <Text style={[styles.paragraph]}>
+              Última actualización:{" "}
+              {new Date(
+                dataDentro[dataDentro.length - 1].time * 1000,
+              ).toLocaleString()}
+            </Text>
+          </View>
+        </>
+      ) : (
+        <Text style={{ color: "#fff" }}>Sin datos de dentro.</Text>
       )}
     </View>
   );
@@ -83,5 +89,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     alignItems: "center",
     justifyContent: "center",
+  },
+  title: {
+    color: "#fff",
+    fontSize: 20,
+    marginVertical: 5,
+  },
+  paragraph: {
+    color: "#fff",
+    fontSize: 16,
+    marginVertical: 5,
+    textAlign: "left",
   },
 });

@@ -39,7 +39,7 @@ export async function getEspData() {
         console.log("Data:", dataItems);
         maxItems = dataItems.maxItems;
       } catch (e) {
-        console.log("TODO: /weatheritems | ", e);
+        console.log("TODO: /weathervectoritems | ", e);
       }
       if (maxItems < 0) {
         msg = "No data";

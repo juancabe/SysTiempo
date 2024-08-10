@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View } from "react-native";
+import { Link } from "expo-router";
 import { FirstView } from "./FirstView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ListOfTemperatures } from "./ListOfTemperatures";
@@ -22,6 +23,9 @@ export function Main() {
       }}
     >
       <Logo />
+      <Link href="/about" className="text-blue-500 text-lg pt-4">
+        Ir al about
+      </Link>
 
       <FirstView
         urlFuera={urlFuera}

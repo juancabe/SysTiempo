@@ -99,6 +99,30 @@ public:
       return index_time;
 
     }
+
+    int getIndexFromTime(unsigned int time){
+      if(firstItemP < 0 && lastItemP < 0) return -1;
+      else if(firstItemP < 0 && lastItemP == 0){
+        if(weather[lastItemP].time == time) return lastItemP;
+        else return -1;
+      }
+      else{
+        if(lastItemP > firstItemP){
+          for(int i = firstItemP; i <= lastItemP; i++){
+            if(weather[i].time == time) return i;
+          }
+        }
+        else{
+          for(int i = firstItemP; i < items; i++){
+            if(weather[i].time == time) return i;
+          }
+          for(int i = 0; i <= lastItemP; i++){
+            if(weather[i].time == time) return i;
+          }
+        }
+      }
+      return -1;
+    }
       
 
     int getAvailableItems(){
@@ -131,36 +155,6 @@ public:
                 ",\"hum\":" + String((int) weather[index].humBeforePoint) + "." + humAfterPointStr +
                 ",\"time\":" + String(weather[index].time) + "}");
     }
-
-
-    // Shouldn't be used as it will occupy all the memory
-    /*
-    String toString() {
-        String str = "\n--VECTOR--\n";
-        if(firstItemP < 0 && lastItemP < 0) return str;
-
-        else if(firstItemP < 0 && lastItemP == 0)
-          str += getWeatherString(lastItemP) + "\n";
-        else{
-          if(lastItemP > firstItemP){
-            for(int i = firstItemP; i <= lastItemP; i++){
-              str += getWeatherString(i) + "\n";
-            }
-          }
-          else{
-            for(int i = firstItemP; i < items; i++){
-              str += getWeatherString(i) + "\n";
-            }
-            for(int i = 0; i <= lastItemP; i++){
-              str += getWeatherString(i) + "\n";
-            }
-          }
-        }
-        
-        str += "--VECTOR--\n";
-        return str;
-    }
-    */
     
 
     void sendWeather(void (*sendFunc)(const String &)){

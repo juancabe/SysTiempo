@@ -105,6 +105,19 @@ void handleIndexesNTimes(){
   server.send(200, "text/plain", str);
 }
 
+void handleIndexFromTime(){
+  if(server.args() == 0){
+    server.send(200, "text/plain", "-1");
+    return;
+  }
+  unsigned int time = server.arg(0).toInt();
+  if(weatherVector == nullptr){
+    server.send(200, "text/plain", "-1");
+  } else{
+    server.send(200, "text/plain", "{\"index\":" + String(weatherVector->getIndexFromTime(time)) + "}");
+  }
+}
+
 int lastMin = -1;
 void setup(void) {
  
@@ -137,11 +150,10 @@ void setup(void) {
   server.on("/", handleRoot);
   server.on("/weather", handleWeather);
   server.on("/weathervector", handleWeatherVector);
-  // TODO
   server.on("/weatherbyindex", handleWeatherByIndex);
   server.on("/weatherindexesntimes", handleIndexesNTimes);
   server.on("/weathervectoritems", handleVectorItems);
-
+  server.on("/indexfromtime", handleIndexFromTime);
 
   server.onNotFound(handleNotFound);
 

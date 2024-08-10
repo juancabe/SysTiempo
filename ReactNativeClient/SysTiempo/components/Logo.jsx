@@ -4,7 +4,7 @@ import { Image } from "react-native";
 export const Logo = () => {
   return (
     <Image
-      style={{ width: 80, height: 80 }}
+      className="w-20 h-20 opacity-90"
       source={require("../assets/logo.png")}
     />
   );

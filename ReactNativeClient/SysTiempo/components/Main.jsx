@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { getEspData } from "../lib/espdata";
+import { useState } from "react";
 import { View } from "react-native";
-import { StyleSheet, Text, Button, StatusBar } from "react-native";
 import { FirstView } from "./FirstView";
-import { ListOfTemperatures } from "./ListOfTemperatures";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ListOfTemperatures } from "./ListOfTemperatures";
 import { Logo } from "./Logo";
 
 export function Main() {

@@ -8,6 +8,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
+        {/* tailwindcss: className="flex-1 bg-black align-middle justify-center" */}
         <StatusBar style="light" />
         <Main />
       </View>

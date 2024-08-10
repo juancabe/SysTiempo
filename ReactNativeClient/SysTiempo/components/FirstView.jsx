@@ -8,8 +8,20 @@ import { AppContext } from "../context/AppContext";
 export function FirstView() {
   const urlFuera = "esp8266fuera";
   const urlDentro = "esp8266dentro";
-  const { dataFuera, setDataFuera, dataDentro, setDataDentro } =
-    useContext(AppContext);
+  const {
+    dataFuera,
+    setDataFuera,
+    dataDentro,
+    setDataDentro,
+    availableKeysFuera,
+    availableKeysDentro,
+  } = useContext(AppContext);
+
+  const lastTimeFuera =
+    availableKeysFuera[availableKeysFuera.length - 1].split(urlFuera)[1];
+  const lastTimeDentro =
+    availableKeysDentro[availableKeysDentro.length - 1].split(urlDentro)[1];
+
   return (
     <View className="flex-1 bg-black align-middle justify-center">
       <ButtonNData
@@ -17,6 +29,7 @@ export function FirstView() {
         setData={setDataFuera}
         placeName="Fuera"
         url={urlFuera}
+        lastTime={lastTimeFuera}
       />
       <ButtonNData
         data={dataDentro}
@@ -28,7 +41,7 @@ export function FirstView() {
   );
 }
 
-function ButtonNData({ data, setData, placeName, url }) {
+function ButtonNData({ data, setData, placeName, url, lastTime }) {
   const [cargandoData, setCargandoData] = useState(false);
   const [pressIn, setPressIn] = useState(false);
 
@@ -39,7 +52,7 @@ function ButtonNData({ data, setData, placeName, url }) {
           setPressIn(false);
           if (cargandoData) return;
           setCargandoData(true);
-          getEspData(url).then((data) => {
+          getEspData(url, lastTime).then((data) => {
             setData(data);
             setCargandoData(false);
           });

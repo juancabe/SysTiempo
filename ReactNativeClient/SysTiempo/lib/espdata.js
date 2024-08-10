@@ -36,7 +36,7 @@ async function findHelloRespondingIPs(Burl) {
   return results.filter((ip) => ip !== null);
 }
 
-export async function getEspData(Burl) {
+export async function getEspData({ Burl, lastTime }) {
   let url = "http://" + Burl + ".local";
 
   console.log("Looking for ", Burl, " at:", url);

@@ -31,14 +31,24 @@ export const AppProvider = ({ children }) => {
       }
     });
   }
-  const [availableKeysFuera, setAvailableKeysFuera] = useState(
-    getAvailableKeys("esp8266fuera"),
-  );
-  const [availableKeysDentro, setAvailableKeysDentro] = useState(
-    getAvailableKeys("esp8266dentro"),
-  );
-  const [dataFuera, setDataFuera] = useState(null);
-  const [dataDentro, setDataDentro] = useState(null);
+  let availableKeysFuera = getAvailableKeys("esp8266fuera");
+  let availableKeysDentro = getAvailableKeys("esp8266dentro");
+  let dataFuera = [];
+  let dataDentro = [];
+
+  function setDataFuera(data) {
+    console.log("SETTING DATA esp8266fuera");
+    if (data && typeof data != "string")
+      data.forEach((element) => {
+        saveData("esp8266fuera", element);
+      });
+  }
+  function setDataDentro(data) {
+    console.log("SETTING DATA: esp8266dentro");
+    data.forEach((element) => {
+      saveData("esp8266dentro", element);
+    });
+  }
 
   return (
     <AppContext.Provider
@@ -49,9 +59,7 @@ export const AppProvider = ({ children }) => {
         setDataDentro,
         saveData,
         availableKeysFuera,
-        setAvailableKeysFuera,
         availableKeysDentro,
-        setAvailableKeysDentro,
       }}
     >
       {children}

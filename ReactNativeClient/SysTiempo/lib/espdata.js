@@ -84,22 +84,45 @@ export async function getEspData({ Burl, lastTime }) {
   // {"first":{"index":0,"time":1723112255},"last":{"index":0,"time":1723112255}}
   console.log("Fetching data from:", url + "/weatherindexesntimes");
   let response = null;
-  let dataDentro = null;
+  let dataIT = null;
   try {
     response = await fetch(url + "/weatherindexesntimes");
-    dataDentro = await response.json();
+    dataIT = await response.json();
   } catch (e) {
     console.log("Error fetching data:", e);
     return "No ESP8266 device found";
   }
-  console.log("Data:", dataDentro);
+  console.log("Data:", dataIT);
+
+  if (dataIT.first.index === -1) {
+    return "No data";
+  } else if (lastTime > dataIT.first.time) {
+    if (lastTime > dataIT.last.time) {
+      return "No data";
+    } else {
+      try {
+        response = await fetch(url + "/indexfromtime?time=" + lastTime);
+        const data = await response.json();
+        console.log("--RESPONSE FROM INDEXFROMTIME--: ", data);
+        dataIT.first.index = data.index;
+        dataIT.first.time = data.time;
+      } catch (e) {
+        console.log("[indexfromtime]Error fetching data:", e);
+        return "No ESP8266 device found";
+      }
+    }
+  }
+
   let path = "/weatherbyindex?index=";
+  console.log("[FETCHING]", url + path + dataIT.first.index);
   // {"index":0,"temp":27.77,"hum":46.43,"time":1723112255}
-  if (dataDentro.first.index < 0) {
+  if (dataIT.first.index < 0) {
     msg = "No data";
   } else {
-    if (dataDentro.first.index <= dataDentro.last.index) {
-      for (let i = dataDentro.first.index; i < dataDentro.last.index; i++) {
+    if (dataIT.first.index <= dataIT.last.index) {
+      console.log("dataIT.first.index: ", dataIT.first.index);
+      console.log("dataIT.last.index: ", dataIT.last.index);
+      for (let i = dataIT.first.index; i < dataIT.last.index; i++) {
         try {
           const urlIs = url + path + i;
           //console.log("Fetching data from:", urlIs);
@@ -125,7 +148,7 @@ export async function getEspData({ Burl, lastTime }) {
       if (maxItems < 0) {
         msg = "No data";
       } else {
-        for (let i = dataDentro.first.index; i < maxItems; i++) {
+        for (let i = dataIT.first.index; i < maxItems; i++) {
           try {
             const urlIs = url + path + i;
             console.log("Fetching data from:", urlIs);
@@ -136,7 +159,7 @@ export async function getEspData({ Burl, lastTime }) {
             console.log("Error fetching data:", e);
           }
         }
-        for (let i = 0; i <= dataDentro.last.index; i++) {
+        for (let i = 0; i <= dataIT.last.index; i++) {
           try {
             const urlIs = url + path + i;
             console.log("Fetching data from:", urlIs);
@@ -150,8 +173,8 @@ export async function getEspData({ Burl, lastTime }) {
       }
     }
   }
-  if (Burl === "esp8266fuera") {
-    console.log("DataFuera:", msg);
-  }
+
+  console.log("EL MENSAJE ES:", msg);
+
   return msg;
 }

@@ -18,9 +18,13 @@ export function FirstView() {
   } = useContext(AppContext);
 
   const lastTimeFuera =
-    availableKeysFuera[availableKeysFuera.length - 1].split(urlFuera)[1];
+    availableKeysFuera.length > 0
+      ? availableKeysFuera[availableKeysFuera.length - 1].split(urlFuera)[1]
+      : -1;
   const lastTimeDentro =
-    availableKeysDentro[availableKeysDentro.length - 1].split(urlDentro)[1];
+    availableKeysDentro.length > 0
+      ? availableKeysDentro[availableKeysDentro.length - 1].split(urlDentro)[1]
+      : -1;
 
   return (
     <View className="flex-1 bg-black align-middle justify-center">
@@ -36,6 +40,7 @@ export function FirstView() {
         setData={setDataDentro}
         placeName="Dentro"
         url={urlDentro}
+        lastTime={lastTimeDentro}
       />
     </View>
   );
@@ -44,6 +49,7 @@ export function FirstView() {
 function ButtonNData({ data, setData, placeName, url, lastTime }) {
   const [cargandoData, setCargandoData] = useState(false);
   const [pressIn, setPressIn] = useState(false);
+  const [dataPintar, setDataPintar] = useState(false);
 
   return (
     <View className="ease-in pt-6">
@@ -51,9 +57,24 @@ function ButtonNData({ data, setData, placeName, url, lastTime }) {
         onPressOut={() => {
           setPressIn(false);
           if (cargandoData) return;
+          console.log("Last time:", lastTime);
           setCargandoData(true);
-          getEspData(url, lastTime).then((data) => {
-            setData(data);
+          getEspData({ Burl: url, lastTime: lastTime }).then((dataReturned) => {
+            if (
+              data &&
+              data.length > 0 &&
+              !(typeof dataReturned === "string")
+            ) {
+              data.concat(dataReturned);
+            } else {
+              data = dataReturned;
+            }
+            setData(dataReturned);
+            if (typeof data === "string") {
+              setDataPintar(data);
+            } else {
+              setDataPintar(data[data.length - 1]);
+            }
             setCargandoData(false);
           });
         }}
@@ -72,9 +93,12 @@ function ButtonNData({ data, setData, placeName, url, lastTime }) {
 
       {cargandoData ? (
         <ActivityIndicator className="pt-6" />
-      ) : data ? (
-        data === "No data" || data === "No ESP8266 device found" ? (
-          <Text className="text-red-500 text-lg py-3 text-center">{data}</Text>
+      ) : dataPintar ? (
+        dataPintar === "No dataPintar" ||
+        dataPintar === "No ESP8266 device found" ? (
+          <Text className="text-red-500 text-lg py-3 text-center">
+            {dataPintar}
+          </Text>
         ) : (
           <>
             <Text className="text-white text-xl py-5 font-bold text-center">
@@ -82,14 +106,14 @@ function ButtonNData({ data, setData, placeName, url, lastTime }) {
             </Text>
             <View>
               <Text className="text-white text-lg py-1 text-center">
-                Temp: {data[data.length - 1].temp}ºC
+                Temp: {dataPintar.temp}ºC
               </Text>
               <Text className="text-white text-lg py-1 text-center">
-                Hum: {data[data.length - 1].hum}%
+                Hum: {dataPintar.hum}%
               </Text>
               <Text className="text-white text-lg py-1 text-center">
                 Updated:{" "}
-                {new Date(data[data.length - 1].time * 1000)
+                {new Date(dataPintar.time * 1000)
                   .toLocaleString("en-GB", {
                     hour: "2-digit",
                     minute: "2-digit",

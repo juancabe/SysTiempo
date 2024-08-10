@@ -1,32 +1,57 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AppContext } from "../context/AppContext";
 
-export function ListOfTemperatures({ data }) {
-  const insets = useSafeAreaInsets();
+function ShowListOfTemperatures({ data }) {
   console.log(data);
   let toSend = (
-    <View style={{ paddingTop: insets.top }}>
-      <FlatList
-        style={styles.flatList}
-        data={data}
-        keyExtractor={(item) => item.time.toString()}
-        renderItem={({ item }) => (
-          <Text style={styles.item}>
-            {item.temp}ºC - {new Date(item.time * 1000).toLocaleString()}
-          </Text>
-        )}
-      />
-    </View>
+    <FlatList
+      data={data}
+      keyExtractor={(item) => item.time.toString()}
+      renderItem={({ item }) => (
+        <Text className="text-white text-lg pb-1 text-center">
+          {item.temp}ºC - {new Date(item.time * 1000).toLocaleString()}
+        </Text>
+      )}
+    />
   );
 
   return toSend;
 }
+export function ListOfTemperatures() {
+  const { dataFuera, dataDentro } = useContext(AppContext);
+
+  return (
+    <View className="flex-1 bg-black justify-around">
+      {dataDentro && dataDentro.length > 0 ? (
+        <>
+          <Text className="text-white text-3xl text-center p-3">
+            Datos dentro
+          </Text>
+          <ShowListOfTemperatures data={dataDentro} />
+        </>
+      ) : (
+        <Text className="text-white text-3xl text-center p-3">
+          No hay datos dentro
+        </Text>
+      )}
+      {dataFuera && dataFuera.length > 0 ? (
+        <>
+          <Text className="text-white text-3xl text-center p-3">
+            Datos fuera
+          </Text>
+          <ShowListOfTemperatures data={dataFuera} />
+        </>
+      ) : (
+        <Text className="text-white text-3xl text-center p-3">
+          No hay datos fuera
+        </Text>
+      )}
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
-  flatList: {
-    backgroundColor: "#000",
-  },
   item: {
     color: "#fff",
     fontSize: 16,

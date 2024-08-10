@@ -27,7 +27,8 @@
     "react-native-screens": "3.31.1",
     "text-decoding": "^1.0.0",
     "text-encoding": "^0.7.0",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "@react-native-async-storage/async-storage": "1.23.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

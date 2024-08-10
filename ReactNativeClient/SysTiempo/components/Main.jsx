@@ -4,27 +4,18 @@ import { Link } from "expo-router";
 import { FirstView } from "./FirstView";
 import { ListOfTemperatures } from "./ListOfTemperatures";
 import { Logo } from "./Logo";
+import Feather from "@expo/vector-icons/Feather";
+import { styled } from "nativewind";
+
+const StyledPressable = styled(Pressable);
 
 export function Main() {
-  const urlFuera = "esp8266fuera";
-  const urlDentro = "esp8266dentro";
-  const [dataFuera, setDataFuera] = useState(null);
-  const [dataDentro, setDataDentro] = useState(null);
+  const [infoColor, setInfoColor] = useState("white");
 
+  const [firstViewColor, setFirstViewColor] = useState("white");
   return (
-    <View className="flex-1">
-      <View className="flex-row justify-between">
-        <Link asChild href="/about">
-          <Pressable>
-            <Text className="text-blue-500 text-lg">Ir al about</Text>
-          </Pressable>
-        </Link>
-        <Logo />
-        <View>
-          <Text className="text-black text-lg">Ir al about</Text>
-        </View>
-      </View>
-
+    <View className="flex-1 items-center justify-around">
+      {/*
       <FirstView
         urlFuera={urlFuera}
         urlDentro={urlDentro}
@@ -33,6 +24,37 @@ export function Main() {
         setDataFuera={setDataFuera}
         setDataDentro={setDataDentro}
       />
+      */}
+      <View>
+        <Link asChild href="/loadFirstView">
+          <StyledPressable
+            className="p-4 bg-sky-800 rounded-md"
+            onPressIn={() => {
+              setFirstViewColor("grey");
+            }}
+            onPressOut={() => {
+              setFirstViewColor("white");
+            }}
+          >
+            <Text className="text-white text-4xl">Cargar</Text>
+          </StyledPressable>
+        </Link>
+      </View>
+      <View>
+        <Link asChild href="/loadListTemperatures">
+          <StyledPressable
+            className="p-4 bg-sky-800 rounded-md"
+            onPressIn={() => {
+              setInfoColor("grey");
+            }}
+            onPressOut={() => {
+              setInfoColor("white");
+            }}
+          >
+            <Text className="text-white text-4xl">Lista Temperaturas</Text>
+          </StyledPressable>
+        </Link>
+      </View>
     </View>
   );
 }

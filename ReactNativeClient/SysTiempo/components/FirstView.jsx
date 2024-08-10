@@ -2,15 +2,14 @@ import { useState } from "react";
 import { getEspData } from "../lib/espdata";
 import { View, Pressable } from "react-native";
 import { StyleSheet, Text, Button, ActivityIndicator } from "react-native";
+import React, { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-export function FirstView({
-  urlFuera,
-  urlDentro,
-  dataFuera,
-  dataDentro,
-  setDataFuera,
-  setDataDentro,
-}) {
+export function FirstView() {
+  const urlFuera = "esp8266fuera";
+  const urlDentro = "esp8266dentro";
+  const { dataFuera, setDataFuera, dataDentro, setDataDentro } =
+    useContext(AppContext);
   return (
     <View className="flex-1 bg-black align-middle justify-center">
       <ButtonNData

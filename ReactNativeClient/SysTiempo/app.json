@@ -3,6 +3,7 @@
     "name": "SysTiempo",
     "slug": "SysTiempo",
     "version": "1.0.0",
+    "scheme": "systiempo",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -29,6 +30,9 @@
       "eas": {
         "projectId": "88edcc5a-bfe1-4527-acd1-84abb0242d5b"
       }
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

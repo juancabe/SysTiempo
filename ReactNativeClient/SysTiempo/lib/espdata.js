@@ -36,10 +36,8 @@ async function findHelloRespondingIPs(Burl) {
   return results.filter((ip) => ip !== null);
 }
 
-export async function getEspData(Burl) {
-  let url = "";
-  if (Burl === "esp8266dentro") url = "http://192.168.1.128"; // TODO: Change this
-  else url = "http://" + Burl + ".local";
+export async function getEspData({ Burl, lastTime }) {
+  let url = "http://" + Burl + ".local";
 
   console.log("Looking for ", Burl, " at:", url);
   try {
@@ -78,7 +76,7 @@ export async function getEspData(Burl) {
       }
     } catch (e) {
       console.log("Error fetching data at ", url, " for", Burl);
-      return "No ESP8266 device found";
+      msg = "No ESP8266 device found";
     }
   }
 
@@ -92,6 +90,7 @@ export async function getEspData(Burl) {
     dataDentro = await response.json();
   } catch (e) {
     console.log("Error fetching data:", e);
+    return "No ESP8266 device found";
   }
   console.log("Data:", dataDentro);
   let path = "/weatherbyindex?index=";
@@ -132,7 +131,7 @@ export async function getEspData(Burl) {
             console.log("Fetching data from:", urlIs);
             const response = await fetch(urlIs);
             const data = await response.json();
-            msg += data;
+            msg.push(data);
           } catch (e) {
             console.log("Error fetching data:", e);
           }
@@ -151,6 +150,8 @@ export async function getEspData(Burl) {
       }
     }
   }
-  //console.log("Data fetched:", Burl, msg);
+  if (Burl === "esp8266fuera") {
+    console.log("DataFuera:", msg);
+  }
   return msg;
 }

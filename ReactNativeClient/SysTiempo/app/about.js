@@ -1,14 +1,20 @@
 import React from "react";
-import { Text, ScrollView } from "react-native";
+import { Text, ScrollView, View } from "react-native";
 import { Link } from "expo-router";
 
 export default function About() {
   return (
     <ScrollView>
-      <Text className="text-white font-bold mb-8 text-2xl">About</Text>
-      <Link href="/" className="text-blue-500 text-lg pt-4">
-        Ir al home
-      </Link>
+      <View className="flex-row justify-between">
+        <Link href="/" className="text-blue-500 text-lg">
+          Ir al home
+        </Link>
+        <Text className="text-white font-bold mb-8 text-2xl text-center">
+          About
+        </Text>
+        <Text className="text-black text-lg">Ir al home</Text>
+      </View>
+
       <Text className="text-white text-lg">
         Esta es la aplicacion para controlar el tiempo de casa, exterior e
         interior.

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getEspData } from "../lib/espdata";
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import { StyleSheet, Text, Button, ActivityIndicator } from "react-native";
 
 export function FirstView({
@@ -31,12 +31,13 @@ export function FirstView({
 
 function ButtonNData({ data, setData, placeName, url }) {
   const [cargandoData, setCargandoData] = useState(false);
+  const [pressIn, setPressIn] = useState(false);
 
   return (
     <View className="ease-in pt-6">
-      <Button
-        title={cargandoData ? "Cargando " + placeName : "Cargar " + placeName}
-        onPress={() => {
+      <Pressable
+        onPressOut={() => {
+          setPressIn(false);
           if (cargandoData) return;
           setCargandoData(true);
           getEspData(url).then((data) => {
@@ -44,25 +45,37 @@ function ButtonNData({ data, setData, placeName, url }) {
             setCargandoData(false);
           });
         }}
-      />
+        onPressIn={() => setPressIn(true)}
+      >
+        {pressIn || cargandoData ? (
+          <Text className="text-blue-300 font-bold text-xl py-3 text-center opacity-50">
+            {cargandoData ? "Cargando " + placeName : "Cargar " + placeName}
+          </Text>
+        ) : (
+          <Text className="text-blue-300 font-bold text-xl py-3 text-center">
+            {cargandoData ? "Cargando " + placeName : "Cargar " + placeName}
+          </Text>
+        )}
+      </Pressable>
+
       {cargandoData ? (
         <ActivityIndicator className="pt-6" />
       ) : data ? (
         data === "No data" || data === "No ESP8266 device found" ? (
-          <Text className="text-red-500 text-lg py-3 text-left">{data}</Text>
+          <Text className="text-red-500 text-lg py-3 text-center">{data}</Text>
         ) : (
           <>
             <Text className="text-white text-xl py-5 font-bold text-center">
               {placeName}
             </Text>
             <View>
-              <Text className="text-white text-lg py-1 text-left">
+              <Text className="text-white text-lg py-1 text-center">
                 Temp: {data[data.length - 1].temp}ºC
               </Text>
-              <Text className="text-white text-lg py-1 text-left">
+              <Text className="text-white text-lg py-1 text-center">
                 Hum: {data[data.length - 1].hum}%
               </Text>
-              <Text className="text-white text-lg py-1 text-left">
+              <Text className="text-white text-lg py-1 text-center">
                 Updated:{" "}
                 {new Date(data[data.length - 1].time * 1000)
                   .toLocaleString("en-GB", {
@@ -79,7 +92,9 @@ function ButtonNData({ data, setData, placeName, url }) {
           </>
         )
       ) : (
-        <Text className="text-white">Sin datos de {placeName}.</Text>
+        <Text className="text-white text-center">
+          Sin datos de {placeName}.
+        </Text>
       )}
     </View>
   );

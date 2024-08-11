@@ -13,8 +13,6 @@ import { AppContext, AppProvider } from "../context/AppContext";
 
 export default function Layout() {
   const insets = useSafeAreaInsets();
-  console.log("insetsPaddingTop", insets.top);
-  console.log("insetsPaddingBottom", insets.bottom);
   const [homeColor, setHomeColor] = React.useState("white");
   const [infoColor, setInfoColor] = React.useState("white");
 

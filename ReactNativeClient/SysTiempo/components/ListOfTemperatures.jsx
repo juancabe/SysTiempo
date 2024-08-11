@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { AppContext } from "../context/AppContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function ShowListOfTemperatures({ data }) {
   console.log(data);
@@ -18,24 +19,49 @@ function ShowListOfTemperatures({ data }) {
 
   return toSend;
 }
+
 export function ListOfTemperatures() {
-  const { dataFuera, dataDentro } = useContext(AppContext);
+  const [dataDentro, setDataDentro] = useState([]);
+  const [dataFuera, setDataFuera] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Para manejar el estado de carga
+
+  async function fillData(serverName, setData) {
+    let availableKeys = [];
+    await AsyncStorage.getAllKeys().then((keys) => {
+      availableKeys = keys.filter((key) => key.includes(serverName));
+      if (availableKeys.length > 0) availableKeys.sort();
+      const promises = availableKeys.map((key) =>
+        AsyncStorage.getItem(key).then((value) => JSON.parse(value)),
+      );
+      Promise.all(promises).then((values) => {
+        setData(values);
+      });
+    });
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fillData("esp8266fuera", setDataFuera);
+      await fillData("esp8266dentro", setDataDentro);
+      setIsLoading(false); // Indicar que la carga ha terminado
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-black justify-around">
+        <Text className="text-white text-3xl text-center p-3">
+          Cargando datos...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-black justify-around">
-      {dataDentro && dataDentro.length > 0 ? (
-        <>
-          <Text className="text-white text-3xl text-center p-3">
-            Datos dentro
-          </Text>
-          <ShowListOfTemperatures data={dataDentro} />
-        </>
-      ) : (
-        <Text className="text-white text-3xl text-center p-3">
-          No hay datos dentro
-        </Text>
-      )}
-      {dataFuera && dataFuera.length > 0 ? (
+      {dataFuera.length > 0 ? (
         <>
           <Text className="text-white text-3xl text-center p-3">
             Datos fuera
@@ -45,6 +71,18 @@ export function ListOfTemperatures() {
       ) : (
         <Text className="text-white text-3xl text-center p-3">
           No hay datos fuera
+        </Text>
+      )}
+      {dataDentro.length > 0 ? (
+        <>
+          <Text className="text-white text-3xl text-center p-3">
+            Datos dentro
+          </Text>
+          <ShowListOfTemperatures data={dataDentro} />
+        </>
+      ) : (
+        <Text className="text-white text-3xl text-center p-3">
+          No hay datos dentro
         </Text>
       )}
     </View>

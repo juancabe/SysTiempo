@@ -6,21 +6,19 @@ export const AppContext = createContext();
 // Keys for AsyncStorage are formed by the server name and the epoch time of the reading
 // e.g. "esp8266fuera-1630350000"
 
-function getAvailableKeys(serverName) {
-  let availableKeys = [];
-  AsyncStorage.getAllKeys((err, keys) => {
-    if (err) {
-      console.log("[getInitialData]AsyncStorage error: ", err);
-    } else {
-      availableKeys = keys.filter((key) => key.includes(serverName));
-      console.log("[getInitialData]availableKeys: ", availableKeys);
-    }
-  });
-  if (availableKeys.length > 0) availableKeys.sort();
-  return availableKeys;
-}
-
 export const AppProvider = ({ children }) => {
+  async function getAvailableKeys(serverName) {
+    let availableKeys = [];
+    await AsyncStorage.getAllKeys((err, keys) => {
+      if (err) {
+        console.log("[getInitialData]AsyncStorage error: ", err);
+      } else {
+        availableKeys = keys.filter((key) => key.includes(serverName));
+      }
+    });
+    if (availableKeys.length > 0) availableKeys.sort();
+    return availableKeys;
+  }
   function saveData(serverName, data) {
     let key = `${serverName}-${data.time}`;
     AsyncStorage.setItem(key, JSON.stringify(data), (err) => {
@@ -31,8 +29,6 @@ export const AppProvider = ({ children }) => {
       }
     });
   }
-  let availableKeysFuera = getAvailableKeys("esp8266fuera");
-  let availableKeysDentro = getAvailableKeys("esp8266dentro");
   let dataFuera = [];
   let dataDentro = [];
 
@@ -58,8 +54,7 @@ export const AppProvider = ({ children }) => {
         dataDentro,
         setDataDentro,
         saveData,
-        availableKeysFuera,
-        availableKeysDentro,
+        getAvailableKeys,
       }}
     >
       {children}

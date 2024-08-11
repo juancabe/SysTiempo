@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getEspData } from "../lib/espdata";
 import { View, Pressable } from "react-native";
-import { StyleSheet, Text, Button, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, ActivityIndicator } from "react-native";
 import React, { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
@@ -13,18 +13,28 @@ export function FirstView() {
     setDataFuera,
     dataDentro,
     setDataDentro,
-    availableKeysFuera,
-    availableKeysDentro,
+    getAvailableKeys,
   } = useContext(AppContext);
 
-  const lastTimeFuera =
-    availableKeysFuera.length > 0
-      ? availableKeysFuera[availableKeysFuera.length - 1].split(urlFuera)[1]
-      : -1;
-  const lastTimeDentro =
-    availableKeysDentro.length > 0
-      ? availableKeysDentro[availableKeysDentro.length - 1].split(urlDentro)[1]
-      : -1;
+  const [availableKeysFuera, setAvailableKeysFuera] = useState([]);
+  const [availableKeysDentro, setAvailableKeysDentro] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getAvailableKeys(urlFuera).then((keys) => setAvailableKeysFuera(keys));
+    getAvailableKeys(urlDentro).then((keys) => setAvailableKeysDentro(keys));
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-black justify-around">
+        <Text className="text-white text-3xl text-center p-3">
+          Cargando datos...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-black align-middle justify-center">
@@ -33,14 +43,26 @@ export function FirstView() {
         setData={setDataFuera}
         placeName="Fuera"
         url={urlFuera}
-        lastTime={lastTimeFuera}
+        lastTime={
+          availableKeysFuera.length > 0
+            ? availableKeysFuera[availableKeysFuera.length - 1].split(
+                urlFuera + "-",
+              )[1]
+            : -1
+        }
       />
       <ButtonNData
         data={dataDentro}
         setData={setDataDentro}
         placeName="Dentro"
         url={urlDentro}
-        lastTime={lastTimeDentro}
+        lastTime={
+          availableKeysDentro.length > 0
+            ? availableKeysDentro[availableKeysDentro.length - 1].split(
+                urlDentro + "-",
+              )[1]
+            : -1
+        }
       />
     </View>
   );

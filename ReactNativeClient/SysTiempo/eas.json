@@ -15,7 +15,12 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "env" :{
+        "ANDROID_SDK_ROOT": "/Users/juan/Library/Android/sdk"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {}
   },

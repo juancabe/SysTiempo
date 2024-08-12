@@ -12,52 +12,16 @@ export default function About() {
       </View>
       <View className="pt-6">
         <Text className="text-white text-lg">
-          Esta es la aplicacion para controlar el tiempo de casa, exterior e
-          interior.
+          Esta es la aplicacion para ver el tiempo de casa, exterior e interior.
         </Text>
         <Text className="text-white text-lg">
-          Se puede ver el tiempo de la casa, con una base de datos interna.
+          Se guardarán los datos de la casa en una base de datos interna.
         </Text>
         <Text className="text-white text-lg">
-          Se puede ver el tiempo exterior, con una base de datos externa,
-          situada en los diferentes servidores de la red, estos tienen una
-          capacidad de almacenamiento maxima de 3 semanas.
+          La primera vez que cargues los datos de la casa, tardará más tiempo.
         </Text>
         <Text className="text-white text-lg">
-          Esta es la aplicacion para controlar el tiempo de casa, exterior e
-          interior.
-        </Text>
-        <Text className="text-white text-lg">
-          Se puede ver el tiempo de la casa, con una base de datos interna.
-        </Text>
-        <Text className="text-white text-lg">
-          Se puede ver el tiempo exterior, con una base de datos externa,
-          situada en los diferentes servidores de la red, estos tienen una
-          capacidad de almacenamiento maxima de 3 semanas.
-        </Text>
-        <Text className="text-white text-lg">
-          Esta es la aplicacion para controlar el tiempo de casa, exterior e
-          interior.
-        </Text>
-        <Text className="text-white text-lg">
-          Se puede ver el tiempo de la casa, con una base de datos interna.
-        </Text>
-        <Text className="text-white text-lg">
-          Se puede ver el tiempo exterior, con una base de datos externa,
-          situada en los diferentes servidores de la red, estos tienen una
-          capacidad de almacenamiento maxima de 3 semanas.
-        </Text>
-        <Text className="text-white text-lg">
-          Esta es la aplicacion para controlar el tiempo de casa, exterior e
-          interior.
-        </Text>
-        <Text className="text-white text-lg">
-          Se puede ver el tiempo de la casa, con una base de datos interna.
-        </Text>
-        <Text className="text-white text-lg">
-          Se puede ver el tiempo exterior, con una base de datos externa,
-          situada en los diferentes servidores de la red, estos tienen una
-          capacidad de almacenamiento maxima de 3 semanas.
+          Se puede ver el tiempo en un gráfico, en la sección de gráficos.
         </Text>
       </View>
     </ScrollView>

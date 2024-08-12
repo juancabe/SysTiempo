@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 import { Slot } from "expo-router";
 import {
   SafeAreaProvider,
@@ -9,7 +9,11 @@ import { StatusBar } from "expo-status-bar";
 import { Link } from "expo-router";
 import { Logo } from "../components/Logo";
 import Feather from "@expo/vector-icons/Feather";
-import { AppContext, AppProvider } from "../context/AppContext";
+import { AppProvider } from "../context/AppContext";
+import { useContext } from "react";
+
+import { getEspData } from "../lib/espdata";
+import { AppContext } from "../context/AppContext";
 
 export default function Layout() {
   const insets = useSafeAreaInsets();
@@ -40,19 +44,21 @@ export default function Layout() {
                 <Feather name="info" size={40} color={infoColor} />
               </Pressable>
             </Link>
-            <Logo />
-            <Link asChild href="/" className="text-blue-500 text-lg">
-              <Pressable
-                onPressIn={() => {
-                  setHomeColor("grey");
-                }}
-                onPressOut={() => {
-                  setHomeColor("white");
-                }}
-              >
-                <Feather name="home" size={40} color={homeColor} />
+            <Link asChild href="/">
+              <Pressable>
+                <Logo />
               </Pressable>
             </Link>
+            <Pressable
+              onPressIn={() => {
+                setHomeColor("grey");
+              }}
+              onPressOut={() => {
+                setHomeColor("white");
+              }}
+            >
+              <Feather name="refresh-cw" size={40} color={homeColor} />
+            </Pressable>
           </View>
           <Slot></Slot>
         </View>

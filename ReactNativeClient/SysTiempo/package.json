@@ -35,7 +35,8 @@
     "react-native-svg-charts": "^5.4.0",
     "text-decoding": "^1.0.0",
     "text-encoding": "^0.7.0",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "expo-file-system": "~17.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

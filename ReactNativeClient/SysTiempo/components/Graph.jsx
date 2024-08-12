@@ -4,37 +4,120 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { LineChart, Grid, XAxis, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
-import Svg, { Line as SvgLine } from "react-native-svg";
+import Svg, { Line as SvgLine, G as G } from "react-native-svg";
 import { styled } from "nativewind";
 
 const StyledPressable = styled(Pressable);
 
 function ShowGraph({ data }) {
+  // Reduce data to approximately 140 items
+  const dataLength = data.length;
+  const stepR = Math.ceil(dataLength / 140);
+
+  // Create an array to hold the reduced data
+  const reducedValues = [];
+
+  // Compute the mean of the surrounding data and reduce the data
+  for (let i = 0; i < dataLength; i += stepR) {
+    let sumTemp = 0;
+    let sumHum = 0;
+    let count = 0;
+
+    for (
+      let j = i - ~~(stepR / 2);
+      j < i + ~~(stepR / 2) && j < dataLength;
+      j++
+    ) {
+      if (j < 0) continue;
+      sumTemp += data[j].temp;
+      sumHum += data[j].hum;
+      count++;
+    }
+
+    reducedValues.push({
+      temp: sumTemp / count,
+      hum: sumHum / count,
+      time: data[i].time,
+    });
+  }
+
+  // Set the reduced data
+  data = reducedValues;
+
   const formattedData = data.map((item) => ({
     time: new Date(item.time * 1000),
     temp: item.temp,
-    hum: item.hum, // Humidity stored as .hum
+    hum: item.hum,
   }));
 
   const temps = formattedData.map((item) => item.temp);
   const humidity = formattedData.map((item) => item.hum);
   const times = formattedData.map((item) => item.time);
 
-  // Determine the step size to show only 10 labels on the X-axis
-  const labelCount = 5;
+  // Determine the step size to show only 10 labels on the bottom X-axis
+  const labelCount = 10;
   const step = Math.ceil(times.length / labelCount);
 
-  // Function to format date and time
+  // Function to format time
   const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${day}/${month} ${hours}:${minutes}`;
+    return `${hours}:${minutes}`;
+  };
+
+  // Function to format date for the new X-axis on top
+  const formatDayStart = (date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    return `${day}/${month}`;
+  };
+
+  // Custom Grid Component
+  const CustomGrid = ({ x, y, data }) => {
+    const lines = [];
+
+    for (let i = 1; i < times.length; i++) {
+      const current = times[i];
+      const prev = times[i - 1];
+
+      if (current.getDate() !== prev.getDate()) {
+        lines.push(
+          <SvgLine
+            key={`line-${i}`}
+            x1={x(i)}
+            x2={x(i)}
+            y1="0%"
+            y2="100%"
+            stroke="rgba(255, 255, 255, 0.7)"
+            strokeWidth={1}
+          />,
+        );
+      }
+    }
+
+    return <G>{lines}</G>;
   };
 
   return (
     <View className="flex-1">
+      {/* New X-Axis at the top for day start */}
+      <XAxis
+        style={{ height: 30 }}
+        data={times}
+        formatLabel={(value, index) => {
+          const current = times[index];
+          const prev = times[index - 1];
+          if (!prev) return;
+          if (current.getDate() !== prev.getDate()) {
+            return formatDayStart(current);
+          }
+          return "";
+        }}
+        contentInset={{ left: 30, right: 30 }}
+        svg={{ fontSize: 10, fill: "white" }}
+        scale={scale.scaleTime}
+      />
+
       <View style={{ height: 200, flexDirection: "row" }}>
         {/* Y-Axis for Temperature */}
         <View className="flex-row">
@@ -54,11 +137,15 @@ function ShowGraph({ data }) {
             contentInset={{ top: 20, bottom: 20 }}
             yMin={Math.min(...temps)}
             yMax={Math.max(...temps)}
+            gridMin={Math.min(...temps)}
+            gridMax={Math.max(...temps)}
+            numberOfTicks={6}
           >
+            <CustomGrid />
             <Grid svg={{ stroke: "rgba(255, 255, 255, 0.2)" }} />
           </LineChart>
           <LineChart
-            style={StyleSheet.absoluteFill} // Overlay humidity line chart on the same graph
+            style={StyleSheet.absoluteFill}
             data={humidity}
             svg={{ stroke: "rgba(34, 192, 100, 0.6)", strokeWidth: 1 }}
             contentInset={{ top: 20, bottom: 20 }}
@@ -66,16 +153,19 @@ function ShowGraph({ data }) {
             yMax={Math.max(...humidity)}
           />
         </View>
+
         {/* Y-Axis for Humidity */}
         <YAxis
           data={humidity}
           contentInset={{ top: 20, bottom: 20 }}
           svg={{ fontSize: 10, fill: "white" }}
-          style={{ marginLeft: 10 }} // Push the humidity axis to the right
+          style={{ marginLeft: 10 }}
           numberOfTicks={6}
           formatLabel={(value) => `.${value}`}
         />
       </View>
+
+      {/* Bottom X-Axis for Time */}
       <XAxis
         style={{ height: 30 }}
         data={times}
@@ -110,34 +200,7 @@ export function Graph() {
         AsyncStorage.getItem(key).then((value) => JSON.parse(value)),
       );
       Promise.all(promises).then((values) => {
-        // Reduce data to approximately 150 items
-        const dataLength = values.length;
-        const step = Math.ceil(dataLength / 150); // Adjusted step to reduce to approximately 150 items
-
-        // Create an array to hold the reduced values
-        const reducedValues = [];
-
-        // Compute the mean of the surrounding values and reduce the data
-        for (let i = 0; i < dataLength; i += step) {
-          let sumTemp = 0;
-          let sumHum = 0;
-          let count = 0;
-
-          for (let j = i; j < i + step && j < dataLength; j++) {
-            sumTemp += values[j].temp;
-            sumHum += values[j].hum;
-            count++;
-          }
-
-          reducedValues.push({
-            temp: sumTemp / count,
-            hum: sumHum / count,
-            time: values[i].time,
-          });
-        }
-
-        // Set the reduced data
-        setData(reducedValues);
+        setData(values);
       });
     });
   }

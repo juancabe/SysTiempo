@@ -55,6 +55,21 @@ export function Main() {
           </StyledPressable>
         </Link>
       </View>
+      <View>
+        <Link asChild href="/loadGraph">
+          <StyledPressable
+            className="p-4 bg-sky-800 rounded-md"
+            onPressIn={() => {
+              setInfoColor("grey");
+            }}
+            onPressOut={() => {
+              setInfoColor("white");
+            }}
+          >
+            <Text className="text-white text-4xl">Gráfico</Text>
+          </StyledPressable>
+        </Link>
+      </View>
     </View>
   );
 }

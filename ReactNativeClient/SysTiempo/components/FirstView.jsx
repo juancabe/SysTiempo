@@ -4,6 +4,7 @@ import { View, Pressable } from "react-native";
 import { StyleSheet, Text, ActivityIndicator } from "react-native";
 import React, { useContext } from "react";
 import { AppContext } from "../context/AppContext";
+import { getAvailableKeys } from "../context/AppContext";
 
 export function FirstView() {
   const urlFuera = "esp8266fuera";
@@ -39,6 +40,24 @@ export function FirstView() {
   return (
     <View className="flex-1 bg-black align-middle justify-center">
       <ButtonNData
+        lastHHMM={
+          availableKeysFuera
+            ? availableKeysFuera.length > 0
+              ? new Date(
+                  availableKeysFuera[availableKeysFuera.length - 1].split(
+                    urlFuera + "-",
+                  )[1] * 1000,
+                )
+                  .toLocaleString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })
+                  .replace(",", "")
+              : -1
+            : -1
+        }
+        numKeys={availableKeysFuera.length}
         data={dataFuera}
         setData={setDataFuera}
         placeName="Fuera"
@@ -52,6 +71,24 @@ export function FirstView() {
         }
       />
       <ButtonNData
+        lastHHMM={
+          availableKeysDentro
+            ? availableKeysDentro.length > 0
+              ? new Date(
+                  availableKeysDentro[availableKeysDentro.length - 1].split(
+                    urlDentro + "-",
+                  )[1] * 1000,
+                )
+                  .toLocaleString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })
+                  .replace(",", "")
+              : -1
+            : -1
+        }
+        numKeys={availableKeysDentro.length}
         data={dataDentro}
         setData={setDataDentro}
         placeName="Dentro"
@@ -68,7 +105,15 @@ export function FirstView() {
   );
 }
 
-function ButtonNData({ data, setData, placeName, url, lastTime }) {
+function ButtonNData({
+  data,
+  setData,
+  placeName,
+  url,
+  lastTime,
+  numKeys,
+  lastHHMM,
+}) {
   const [cargandoData, setCargandoData] = useState(false);
   const [pressIn, setPressIn] = useState(false);
   const [dataPintar, setDataPintar] = useState(false);
@@ -151,29 +196,14 @@ function ButtonNData({ data, setData, placeName, url, lastTime }) {
         )
       ) : (
         <Text className="text-white text-center">
-          Sin datos de {placeName}.
+          {numKeys > 0
+            ? "Hay un total de " +
+              numKeys +
+              " lecturas\nÚltima a las " +
+              lastHHMM
+            : "No hay datos"}
         </Text>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    marginVertical: 5,
-  },
-  paragraph: {
-    color: "#fff",
-    fontSize: 16,
-    marginVertical: 5,
-    textAlign: "left",
-  },
-});

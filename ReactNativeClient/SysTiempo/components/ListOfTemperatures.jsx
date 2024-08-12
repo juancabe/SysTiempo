@@ -66,7 +66,7 @@ export function ListOfTemperatures() {
           <Text className="text-white text-3xl text-center p-3">
             Datos fuera
           </Text>
-          <ShowListOfTemperatures data={dataFuera} />
+          <ShowListOfTemperatures data={dataFuera.slice(-200)} />
         </>
       ) : (
         <Text className="text-white text-3xl text-center p-3">
@@ -78,7 +78,7 @@ export function ListOfTemperatures() {
           <Text className="text-white text-3xl text-center p-3">
             Datos dentro
           </Text>
-          <ShowListOfTemperatures data={dataDentro} />
+          <ShowListOfTemperatures data={dataDentro.slice(-200)} />
         </>
       ) : (
         <Text className="text-white text-3xl text-center p-3">

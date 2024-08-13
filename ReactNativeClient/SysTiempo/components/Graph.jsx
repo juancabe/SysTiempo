@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { LineChart, Grid, XAxis, YAxis } from "react-native-svg-charts";
@@ -9,41 +15,44 @@ import { styled } from "nativewind";
 
 const StyledPressable = styled(Pressable);
 
-function ShowGraph({ data }) {
-  // Reduce data to approximately 140 items
-  const dataLength = data.length;
-  const stepR = Math.ceil(dataLength / 140);
+const DAY = 144;
+const WEEK = 1008;
+const MONTH = 4032;
+const YEAR = 525600;
+const ALL = 0;
 
+async function reduceValues(data, time) {
+  const slicedData = data.slice(-time);
   // Create an array to hold the reduced data
   const reducedValues = [];
-
-  // Compute the mean of the surrounding data and reduce the data
-  for (let i = 0; i < dataLength; i += stepR) {
+  const stepR = Math.ceil(slicedData.length / 140);
+  // Compute the mean of the surrounding slicedData and reduce the slicedData
+  for (let i = 0; i < slicedData.length; i += stepR) {
     let sumTemp = 0;
     let sumHum = 0;
     let count = 0;
 
     for (
       let j = i - ~~(stepR / 2);
-      j < i + ~~(stepR / 2) && j < dataLength;
+      j < i + ~~(stepR / 2) && j < slicedData.length;
       j++
     ) {
       if (j < 0) continue;
-      sumTemp += data[j].temp;
-      sumHum += data[j].hum;
+      sumTemp += slicedData[j].temp;
+      sumHum += slicedData[j].hum;
       count++;
     }
 
     reducedValues.push({
       temp: sumTemp / count,
       hum: sumHum / count,
-      time: data[i].time,
+      time: slicedData[i].time,
     });
   }
+  return reducedValues;
+}
 
-  // Set the reduced data
-  data = reducedValues;
-
+function ShowGraph({ data, time }) {
   const formattedData = data.map((item) => ({
     time: new Date(item.time * 1000),
     temp: item.temp,
@@ -60,16 +69,34 @@ function ShowGraph({ data }) {
 
   // Function to format time
   const formatDate = (date) => {
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+    if (time === DAY) {
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
+    } else if (time === WEEK) {
+      const day = date.getDate().toString().padStart(2, "0");
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      return `${day}/${month}`;
+    } else if (time === MONTH) {
+      const day = date.getDate().toString().padStart(2, "0");
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      return `${day}/${month}`;
+    } else if (time === YEAR) {
+      const month = date.getMonth();
+      return month;
+    } else {
+      const year = date.getFullYear().toString().slice(-2);
+      return year;
+    }
   };
 
   // Function to format date for the new X-axis on top
-  const formatDayStart = (date) => {
+  const formatDateStart = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    return `${day}/${month}`;
+    // year in 2 digits
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day}/${month} ${year}`;
   };
 
   // Custom Grid Component
@@ -77,10 +104,30 @@ function ShowGraph({ data }) {
     const lines = [];
 
     for (let i = 1; i < times.length; i++) {
-      const current = times[i];
-      const prev = times[i - 1];
+      const current =
+        time === DAY
+          ? times[i].getDate()
+          : time === WEEK
+            ? times[i].getDate()
+            : time === MONTH
+              ? ~~(times[i].getDate() / 7)
+              : time === YEAR
+                ? times[i].getMonth()
+                : times[i].getMonth();
+      const prev =
+        i - 1 >= 0
+          ? time === DAY
+            ? times[i - 1].getDate()
+            : time === WEEK
+              ? times[i - 1].getDate()
+              : time === MONTH
+                ? ~~(times[i - 1].getDate() / 7)
+                : time === YEAR
+                  ? times[i - 1].getMonth()
+                  : times[i - 1].getMonth()
+          : 0;
 
-      if (current.getDate() !== prev.getDate()) {
+      if (current > prev) {
         lines.push(
           <SvgLine
             key={`line-${i}`}
@@ -97,9 +144,8 @@ function ShowGraph({ data }) {
 
     return <G>{lines}</G>;
   };
-
   return (
-    <View className="flex-1">
+    <View className="flex">
       {/* New X-Axis at the top for day start */}
       <XAxis
         style={{ height: 30 }}
@@ -108,8 +154,18 @@ function ShowGraph({ data }) {
           const current = times[index];
           const prev = times[index - 1];
           if (!prev) return;
-          if (current.getDate() !== prev.getDate()) {
-            return formatDayStart(current);
+          if (time < MONTH && time !== ALL) {
+            if (current.getDate() !== prev.getDate()) {
+              return formatDateStart(current);
+            }
+          } else if (time === MONTH) {
+            if (~~(current.getDate() / 7) !== ~~(prev.getDate() / 7)) {
+              return formatDateStart(current);
+            }
+          } else {
+            if (current.getMonth() !== prev.getMonth()) {
+              return formatDateStart(current);
+            }
           }
           return "";
         }}
@@ -129,7 +185,7 @@ function ShowGraph({ data }) {
           />
         </View>
 
-        <View style={{ flex: 1, marginHorizontal: 10 }}>
+        <View style={{ flex: 1, marginHorizontal: 5 }}>
           <LineChart
             style={{ flex: 1 }}
             data={temps}
@@ -182,14 +238,13 @@ function ShowGraph({ data }) {
 
 export function Graph() {
   const [dataDentro, setDataDentro] = useState([]);
+  const [firstLoad, setFirstLoad] = useState(true);
   const [dataFuera, setDataFuera] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Para manejar el estado de carga
+  const [isLoading, setIsLoading] = useState("opacity-0");
+  const [reducedDataDentro, setReducedDataDentro] = useState([]);
+  const [reducedDataFuera, setReducedDataFuera] = useState([]);
 
-  const [isPressed24h, setIsPressed24h] = useState(true);
-  const [isPressed7d, setIsPressed7d] = useState(false);
-  const [isPressed1m, setIsPressed1m] = useState(false);
-  const [isPressed1y, setIsPressed1y] = useState(false);
-  const [isPressedAll, setIsPressedAll] = useState(false);
+  const [timePressed, setTimePressed] = useState(DAY);
 
   async function fillData(serverName, setData) {
     let availableKeys = [];
@@ -209,20 +264,36 @@ export function Graph() {
     const fetchData = async () => {
       await fillData("esp8266fuera", setDataFuera);
       await fillData("esp8266dentro", setDataDentro);
-      setIsLoading(false); // Indicar que la carga ha terminado
+      setIsLoading("");
     };
 
     fetchData();
   }, []);
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 bg-black justify-around">
-        <Text className="text-white text-3xl text-center p-3">
-          Cargando datos...
-        </Text>
-      </View>
-    );
+  useEffect(() => {
+    const reduceDataDentro = async () => {
+      if (dataDentro.length > 0) {
+        const reducedDataDentro = await reduceValues(dataDentro, timePressed);
+        setReducedDataDentro(reducedDataDentro);
+      }
+    };
+    const reduceDataFuera = async () => {
+      if (dataFuera.length > 0) {
+        const reducedDataFuera = await reduceValues(dataFuera, timePressed);
+        setReducedDataFuera(reducedDataFuera);
+      }
+    };
+
+    reduceDataFuera();
+    reduceDataDentro();
+    setIsLoading("");
+    if (firstLoad) {
+      setFirstLoad(false);
+    }
+  }, [timePressed, dataDentro, dataFuera, firstLoad]);
+
+  if (firstLoad) {
+    return null;
   }
 
   return (
@@ -233,123 +304,122 @@ export function Graph() {
             <Text className="text-white text-3xl text-center px-3">
               Datos fuera
             </Text>
-            <View className="p-3">
-              <ShowGraph
-                data={dataFuera.slice(
-                  -(isPressed24h
-                    ? 144
-                    : isPressed7d
-                      ? 1008
-                      : isPressed1m
-                        ? 43200
-                        : isPressed1y
-                          ? 525600
-                          : 0),
-                )}
-              />
+            <View className={"p-3 " + isLoading}>
+              <ShowGraph data={reducedDataFuera} time={timePressed}></ShowGraph>
             </View>
           </View>
-        ) : (
-          <Text className="text-white text-3xl text-center p-3">
-            No hay datos fuera
-          </Text>
-        )}
+        ) : null}
         {dataDentro.length > 0 || dataFuera.length > 0 ? (
-          <View className="flex-row justify-around">
+          <View className="flex-row justify-around items-center">
             <StyledPressable
               onPress={() => {
-                if (!isPressed24h) {
-                  setIsPressed24h(true);
-                  if (isPressed7d) {
-                    setIsPressed7d(false);
-                  } else if (isPressed1m) {
-                    setIsPressed1m(false);
-                  } else if (isPressed1y) {
-                    setIsPressed1y(false);
-                  } else if (isPressedAll) {
-                    setIsPressedAll(false);
-                  }
+                if (!(timePressed === DAY)) {
+                  setIsLoading("opacity-0");
+                  setTimePressed(DAY);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${isPressed24h ? "bg-sky-900" : ""}`}
+              className={`bg-sky-600 rounded-md ${timePressed === DAY ? "bg-sky-900" : ""}`}
             >
-              <Text className="text-white text-xl text-center p-3">24H</Text>
+              {timePressed === DAY && isLoading ? (
+                <>
+                  <View className="absolute pl-2 pt-1">
+                    <ActivityIndicator size="large" color="#ffffff" />
+                  </View>
+                  <Text className="text-white text-xl text-center p-3 opacity-0">
+                    24H
+                  </Text>
+                </>
+              ) : (
+                <Text className="text-white text-xl text-center p-3">24H</Text>
+              )}
             </StyledPressable>
             <StyledPressable
               onPress={() => {
-                if (!isPressed7d) {
-                  setIsPressed7d(true);
-                  if (isPressed24h) {
-                    setIsPressed24h(false);
-                  } else if (isPressed1m) {
-                    setIsPressed1m(false);
-                  } else if (isPressed1y) {
-                    setIsPressed1y(false);
-                  } else if (isPressedAll) {
-                    setIsPressedAll(false);
-                  }
+                if (!(timePressed === WEEK)) {
+                  setIsLoading("opacity-0");
+                  setTimePressed(WEEK);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${isPressed7d ? "bg-sky-900" : ""}`}
+              className={`bg-sky-600 rounded-md ${timePressed === WEEK ? "bg-sky-900" : ""}`}
             >
-              <Text className="text-white text-xl text-center p-3">7DY</Text>
+              {timePressed === WEEK && isLoading ? (
+                <>
+                  <View className="absolute pl-2 pt-1">
+                    <ActivityIndicator size="large" color="#ffffff" />
+                  </View>
+                  <Text className="text-white text-xl text-center p-3 opacity-0">
+                    7DY
+                  </Text>
+                </>
+              ) : (
+                <Text className="text-white text-xl text-center p-3">7DY</Text>
+              )}
             </StyledPressable>
             <StyledPressable
               onPress={() => {
-                if (!isPressed1m) {
-                  setIsPressed1m(true);
-                  if (isPressed7d) {
-                    setIsPressed7d(false);
-                  } else if (isPressed24h) {
-                    setIsPressed24h(false);
-                  } else if (isPressed1y) {
-                    setIsPressed1y(false);
-                  } else if (isPressedAll) {
-                    setIsPressedAll(false);
-                  }
+                if (!(timePressed === MONTH)) {
+                  setIsLoading("opacity-0");
+                  setTimePressed(MONTH);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${isPressed1m ? "bg-sky-900" : ""}`}
+              className={`bg-sky-600 rounded-md ${timePressed === MONTH ? "bg-sky-900" : ""}`}
             >
-              <Text className="text-white text-xl text-center p-3">1MT</Text>
+              {timePressed === MONTH && isLoading ? (
+                <>
+                  <View className="absolute pl-2 pt-1">
+                    <ActivityIndicator size="large" color="#ffffff" />
+                  </View>
+                  <Text className="text-white text-xl text-center p-3 opacity-0">
+                    1MT
+                  </Text>
+                </>
+              ) : (
+                <Text className="text-white text-xl text-center p-3">1MT</Text>
+              )}
             </StyledPressable>
             <StyledPressable
               onPress={() => {
-                if (!isPressed1y) {
-                  setIsPressed1y(true);
-                  if (isPressed7d) {
-                    setIsPressed7d(false);
-                  } else if (isPressed1m) {
-                    setIsPressed1m(false);
-                  } else if (isPressed24h) {
-                    setIsPressed24h(false);
-                  } else if (isPressedAll) {
-                    setIsPressedAll(false);
-                  }
+                if (!(timePressed === YEAR)) {
+                  setIsLoading("opacity-0");
+                  setTimePressed(YEAR);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${isPressed1y ? "bg-sky-900" : ""}`}
+              className={`bg-sky-600 rounded-md ${timePressed === YEAR ? "bg-sky-900" : ""}`}
             >
-              <Text className="text-white text-xl text-center p-3">1YR</Text>
+              {timePressed === YEAR && isLoading ? (
+                <>
+                  <View className="absolute pl-2 pt-1">
+                    <ActivityIndicator size="large" color="#ffffff" />
+                  </View>
+                  <Text className="text-white text-xl text-center p-3 opacity-0">
+                    1YR
+                  </Text>
+                </>
+              ) : (
+                <Text className="text-white text-xl text-center p-3">1YR</Text>
+              )}
             </StyledPressable>
             <StyledPressable
               onPress={() => {
-                if (!isPressedAll) {
-                  setIsPressedAll(true);
-                  if (isPressed7d) {
-                    setIsPressed7d(false);
-                  } else if (isPressed1m) {
-                    setIsPressed1m(false);
-                  } else if (isPressed1y) {
-                    setIsPressed1y(false);
-                  } else if (isPressed24h) {
-                    setIsPressed24h(false);
-                  }
+                if (!(timePressed === ALL)) {
+                  setIsLoading("opacity-0");
+                  setTimePressed(ALL);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${isPressedAll ? "bg-sky-900" : ""}`}
+              className={`bg-sky-600 rounded-md ${timePressed === ALL ? "bg-sky-900" : ""}`}
             >
-              <Text className="text-white text-xl text-center p-3">ALL</Text>
+              {timePressed === ALL && isLoading ? (
+                <>
+                  <View className="absolute pl-2 pt-1">
+                    <ActivityIndicator size="large" color="#ffffff" />
+                  </View>
+                  <Text className="text-white text-xl text-center p-3 opacity-0">
+                    All
+                  </Text>
+                </>
+              ) : (
+                <Text className="text-white text-xl text-center p-3">ALL</Text>
+              )}
             </StyledPressable>
           </View>
         ) : null}
@@ -358,27 +428,14 @@ export function Graph() {
             <Text className="text-white text-3xl text-center p-3">
               Datos dentro
             </Text>
-            <View className="p-3">
+            <View className={"p-3 " + isLoading}>
               <ShowGraph
-                data={dataDentro.slice(
-                  -(isPressed24h
-                    ? 144
-                    : isPressed7d
-                      ? 1008
-                      : isPressed1m
-                        ? 43200
-                        : isPressed1y
-                          ? 525600
-                          : 0),
-                )}
-              />
+                data={reducedDataDentro}
+                time={timePressed}
+              ></ShowGraph>
             </View>
           </View>
-        ) : (
-          <Text className="text-white text-3xl text-center p-3">
-            No hay datos dentro
-          </Text>
-        )}
+        ) : null}
       </View>
     </View>
   );

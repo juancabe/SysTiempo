@@ -132,10 +132,10 @@ function ButtonNData({
               !(typeof dataReturned === "string")
             ) {
               data.concat(dataReturned);
+              setData(dataReturned);
             } else {
               data = dataReturned;
             }
-            setData(dataReturned);
             if (typeof data === "string") {
               setDataPintar(data);
             } else {
@@ -160,8 +160,7 @@ function ButtonNData({
       {cargandoData ? (
         <ActivityIndicator className="pt-6" />
       ) : dataPintar ? (
-        dataPintar === "No dataPintar" ||
-        dataPintar === "No ESP8266 device found" ? (
+        typeof dataPintar === "string" ? (
           <Text className="text-red-500 text-lg py-3 text-center">
             {dataPintar}
           </Text>

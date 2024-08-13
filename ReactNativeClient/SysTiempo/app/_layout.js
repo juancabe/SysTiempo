@@ -19,6 +19,7 @@ export default function Layout() {
   const insets = useSafeAreaInsets();
   const [homeColor, setHomeColor] = React.useState("white");
   const [infoColor, setInfoColor] = React.useState("white");
+  const [logoOpacity, setLogoOpacity] = React.useState("opacity-100");
 
   return (
     <AppProvider>
@@ -45,8 +46,15 @@ export default function Layout() {
               </Pressable>
             </Link>
             <Link asChild href="/">
-              <Pressable>
-                <Logo />
+              <Pressable
+                onPressIn={() => {
+                  setLogoOpacity("opacity-50");
+                }}
+                onPressOut={() => {
+                  setLogoOpacity("opacity-100");
+                }}
+              >
+                <Logo opacityStr={logoOpacity} />
               </Pressable>
             </Link>
             <Link asChild href="/loadExportImport">

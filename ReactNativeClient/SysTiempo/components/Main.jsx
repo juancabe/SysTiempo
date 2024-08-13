@@ -7,67 +7,56 @@ import { Logo } from "./Logo";
 import Feather from "@expo/vector-icons/Feather";
 import { styled } from "nativewind";
 
-const StyledPressable = styled(Pressable);
-
 export function Main() {
-  const [infoColor, setInfoColor] = useState("white");
+  const [firstViewColor, setFirstViewColor] = useState("bg-white");
+  const [tempListColor, setTempListColor] = useState("bg-white");
+  const [graphColor, setGraphColor] = useState("bg-white");
 
-  const [firstViewColor, setFirstViewColor] = useState("white");
   return (
     <View className="flex-1 items-center justify-around">
-      {/*
-      <FirstView
-        urlFuera={urlFuera}
-        urlDentro={urlDentro}
-        dataFuera={dataFuera}
-        dataDentro={dataDentro}
-        setDataFuera={setDataFuera}
-        setDataDentro={setDataDentro}
-      />
-      */}
       <View>
         <Link asChild href="/loadFirstView">
-          <StyledPressable
-            className="p-4 bg-sky-800 rounded-md"
+          <Pressable
+            className={"p-4 rounded-md " + firstViewColor}
             onPressIn={() => {
-              setFirstViewColor("grey");
+              setFirstViewColor("bg-neutral-600");
             }}
             onPressOut={() => {
-              setFirstViewColor("white");
+              setFirstViewColor("bg-white");
             }}
           >
-            <Text className="text-white text-4xl">Cargar</Text>
-          </StyledPressable>
+            <Feather name="download" size={70} color="black" />
+          </Pressable>
         </Link>
       </View>
       <View>
         <Link asChild href="/loadListTemperatures">
-          <StyledPressable
-            className="p-4 bg-sky-800 rounded-md"
+          <Pressable
+            className={"p-4 rounded-md " + tempListColor}
             onPressIn={() => {
-              setInfoColor("grey");
+              setTempListColor("bg-neutral-600");
             }}
             onPressOut={() => {
-              setInfoColor("white");
+              setTempListColor("bg-white");
             }}
           >
-            <Text className="text-white text-4xl">Lista Temperaturas</Text>
-          </StyledPressable>
+            <Feather name="list" size={70} color="black" />
+          </Pressable>
         </Link>
       </View>
       <View>
         <Link asChild href="/loadGraph">
-          <StyledPressable
-            className="p-4 bg-sky-800 rounded-md"
+          <Pressable
+            className={"p-4 rounded-md " + graphColor}
             onPressIn={() => {
-              setInfoColor("grey");
+              setGraphColor("bg-neutral-600");
             }}
             onPressOut={() => {
-              setInfoColor("white");
+              setGraphColor("bg-white");
             }}
           >
-            <Text className="text-white text-4xl">Gráfico</Text>
-          </StyledPressable>
+            <Feather name="activity" size={70} color="black" />
+          </Pressable>
         </Link>
       </View>
     </View>

@@ -52,31 +52,20 @@ export async function getEspData({ Burl, lastTime }) {
   } catch (e) {
     console.log("Error fetching data at DNS for", Burl);
     console.log("Trying to find it by IP");
-    /*
-    const firstIP = await findHelloRespondingIPs(Burl);
-    if (firstIP) {
-      url = firstIP;
-      console.log("Found ", Burl, " at:", url);
-    } else {
-      console.log("No ESP8266 device found");
-      return "No ESP8266 device found";
-    }
-    */
     url = "192.168.1.128";
     console.log("Looking at ", url);
-
     try {
       const response = await fetch(url, { method: "GET", mode: "no-cors" });
       const text = await response.text();
       if (text !== Burl) {
         console.log("Not an ESP8266 device");
-        throw new Error("Not an ESP8266 device");
+        return "No ESP8266 device found";
       } else {
         console.log("Found ", Burl, " at:", url);
       }
     } catch (e) {
       console.log("Error fetching data at ", url, " for", Burl);
-      msg = "No ESP8266 device found";
+      return "No ESP8266 device found";
     }
   }
 

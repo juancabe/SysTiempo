@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Divs Inside One Bigger Div</title>
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .div1, .div2 {
+            flex: 1;
+            border: 1px solid black; /* Optional: to visualize the divs */
+        }
+
+        .div1 {
+            background-color: lightblue; /* Optional: different background color */
+        }
+
+        .div2 {
+            background-color: lightcoral; /* Optional: different background color */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="div1"></div>
+        <div class="div2"></div>
+    </div>
+
+</body>
+</html>

@@ -23,15 +23,10 @@ async function fillData(serverName, setData) {
 
 const saveAndShareJsonFile = async ({ dataFuera, dataDentro }) => {
   // Step 2.1: Create an array with the data
-  const data = [];
-  dataFuera.forEach((element) => {
-    data.push({ key: "esp8266fuera", value: element });
-  });
-  dataDentro.forEach((element) => {
-    data.push({ key: "esp8266dentro", value: element });
-  });
-
+  const data = { fuera: dataFuera, dentro: dataDentro };
+  console.log("Data to save and share:", data);
   const jsonString = JSON.stringify(data);
+  console.log("JSON string to save and share:", jsonString);
 
   // Step 2.3: Define the file path in the app's documents directory
   const fileUri = FileSystem.documentDirectory + "myData.json";

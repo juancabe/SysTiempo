@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { getEspData } from "../lib/espdata";
 import { View, Pressable } from "react-native";
-import { StyleSheet, Text, ActivityIndicator } from "react-native";
+import { Text, ActivityIndicator } from "react-native";
 import React, { useContext } from "react";
 import { AppContext } from "../context/AppContext";
-import { getAvailableKeys } from "../context/AppContext";
 
 export function FirstView() {
   const urlFuera = "esp8266fuera";

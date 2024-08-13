@@ -49,16 +49,18 @@ export default function Layout() {
                 <Logo />
               </Pressable>
             </Link>
-            <Pressable
-              onPressIn={() => {
-                setHomeColor("grey");
-              }}
-              onPressOut={() => {
-                setHomeColor("white");
-              }}
-            >
-              <Feather name="refresh-cw" size={40} color={homeColor} />
-            </Pressable>
+            <Link asChild href="/loadExportImport">
+              <Pressable
+                onPressIn={() => {
+                  setHomeColor("grey");
+                }}
+                onPressOut={() => {
+                  setHomeColor("white");
+                }}
+              >
+                <Feather name="upload" size={40} color={homeColor} />
+              </Pressable>
+            </Link>
           </View>
           <Slot></Slot>
         </View>

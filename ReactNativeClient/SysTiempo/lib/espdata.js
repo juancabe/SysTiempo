@@ -163,7 +163,5 @@ export async function getEspData({ Burl, lastTime }) {
     }
   }
 
-  console.log("EL MENSAJE ES:", msg);
-
   return msg;
 }

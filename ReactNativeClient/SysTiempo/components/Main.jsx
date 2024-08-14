@@ -59,6 +59,21 @@ export function Main() {
           </Pressable>
         </Link>
       </View>
+      <View>
+        <Link asChild href="/loadBackgroundFetch">
+          <Pressable
+            className={"p-4 rounded-md " + graphColor}
+            onPressIn={() => {
+              setGraphColor("bg-neutral-600");
+            }}
+            onPressOut={() => {
+              setGraphColor("bg-white");
+            }}
+          >
+            <Feather name="sliders" size={70} color="black" />
+          </Pressable>
+        </Link>
+      </View>
     </View>
   );
 }

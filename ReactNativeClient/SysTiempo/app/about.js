@@ -40,12 +40,12 @@ export default function About() {
           </Text>
         </View>
         <View className="flex-row items-center pb-3">
-          <Feather name="activity" size={30} color="white" />
+          <Feather name="download" size={30} color="white" />
           <View className="pl-2">
             <Feather name="arrow-right" size={18} color="white" />
           </View>
           <Text className="text-white text-lg flex-1 pl-2" numberOfLines={4}>
-            para ver la grafica de temperaturas
+            para cargar nuevos datos de los sensores
           </Text>
         </View>
         <View className="flex-row items-center pb-3">
@@ -58,12 +58,22 @@ export default function About() {
           </Text>
         </View>
         <View className="flex-row items-center pb-3">
-          <Feather name="download" size={30} color="white" />
+          <Feather name="activity" size={30} color="white" />
           <View className="pl-2">
             <Feather name="arrow-right" size={18} color="white" />
           </View>
           <Text className="text-white text-lg flex-1 pl-2" numberOfLines={4}>
-            para cargar nuevos datos de los sensores
+            para ver la grafica de temperaturas
+          </Text>
+        </View>
+        <View className="flex-row items-center pb-3">
+          <Feather name="sliders" size={30} color="white" />
+          <View className="pl-2">
+            <Feather name="arrow-right" size={18} color="white" />
+          </View>
+          <Text className="text-white text-lg flex-1 pl-2" numberOfLines={4}>
+            para cambiar la configuración de la aplicación (recargas en segundo
+            plano)
           </Text>
         </View>
       </View>

@@ -12,7 +12,6 @@ import Feather from "@expo/vector-icons/Feather";
 import { AppProvider } from "../context/AppContext";
 import { useContext } from "react";
 
-import { getEspData } from "../lib/espdata";
 import { AppContext } from "../context/AppContext";
 
 export default function Layout() {

@@ -6,7 +6,6 @@ export const Logo = ({ opacityStr, h, w }) => {
   let width = w ? w : 70;
 
   return (
-    //`w-[{70}px] h-[{70}px]`
     <Image
       className={opacityStr}
       style={{ width: width, height: height }}

@@ -4,7 +4,6 @@ import { AppContext } from "../context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function ShowListOfTemperatures({ data }) {
-  console.log(data);
   let toSend = (
     <FlatList
       data={data}
@@ -43,7 +42,7 @@ export function ListOfTemperatures() {
     const fetchData = async () => {
       await fillData("esp8266fuera", setDataFuera);
       await fillData("esp8266dentro", setDataDentro);
-      setIsLoading(false); // Indicar que la carga ha terminado
+      setIsLoading(false);
     };
 
     fetchData();
@@ -88,12 +87,3 @@ export function ListOfTemperatures() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  item: {
-    color: "#fff",
-    fontSize: 16,
-    marginVertical: 5,
-    textAlign: "left",
-  },
-});

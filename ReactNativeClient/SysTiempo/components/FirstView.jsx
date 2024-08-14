@@ -132,10 +132,18 @@ function ButtonNData({
               !(typeof dataReturned === "string")
             ) {
               data.concat(dataReturned);
-              setData(dataReturned);
             } else {
               data = dataReturned;
             }
+
+            if (
+              dataReturned &&
+              dataReturned.length > 0 &&
+              !(typeof dataReturned === "string")
+            ) {
+              setData(dataReturned);
+            }
+
             if (typeof data === "string") {
               setDataPintar(data);
             } else {
@@ -166,9 +174,6 @@ function ButtonNData({
           </Text>
         ) : (
           <>
-            <Text className="text-white text-xl py-5 font-bold text-center">
-              {placeName}
-            </Text>
             <View>
               <Text className="text-white text-lg py-1 text-center">
                 Temp: {dataPintar.temp}ºC

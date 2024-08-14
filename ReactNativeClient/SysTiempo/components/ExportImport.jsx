@@ -3,6 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Sharing from "expo-sharing";
+import { Feather } from "@expo/vector-icons";
 
 import { styled } from "nativewind";
 import { useState, useEffect } from "react";
@@ -65,7 +66,7 @@ export function ExportImport() {
       await fillData("esp8266fuera", setDataFuera);
       await fillData("esp8266dentro", setDataDentro);
       setIsLoading(false); // Indicar que la carga ha terminado
-      setShareButtonState("bg-sky-600");
+      setShareButtonState("bg-white");
     };
 
     fetchData();
@@ -75,10 +76,10 @@ export function ExportImport() {
     <View className="flex-1 justify-around">
       <View className="items-center">
         <Pressable
-          className={`p-4 ${shareButtonState} rounded-md border border-white`}
+          className={`p-4 ${shareButtonState} rounded-md`}
           onPressIn={() => {
             if (
-              shareButtonState !== "bg-sky-600" &&
+              shareButtonState !== "bg-white" &&
               shareButtonState !== "bg-green-600" &&
               shareButtonState !== "bg-red-600"
             )
@@ -88,24 +89,13 @@ export function ExportImport() {
           }}
           onPressOut={() => {
             if (shareButtonState !== "bg-sky-800") return;
-            setShareButtonState("bg-orange-600");
+            setShareButtonState("bg-orange-400");
             saveAndShareJsonFile({ dataFuera, dataDentro }).then(() => {
               setShareButtonState("bg-green-600");
             });
           }}
         >
-          <Text className="text-white text-4xl">
-            {shareButtonState === "bg-gray-800"
-              ? "Cargando"
-              : shareButtonState === "bg-sky-600" ||
-                  shareButtonState === "bg-sky-800"
-                ? "Exportar"
-                : shareButtonState === "bg-green-600"
-                  ? "Exportado"
-                  : shareButtonState === "bg-red-600"
-                    ? "Error"
-                    : "Exportando"}
-          </Text>
+          <Feather name="share-2" size={90} color="black" />
         </Pressable>
       </View>
     </View>

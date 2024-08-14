@@ -222,16 +222,18 @@ function ShowGraph({ data, time }) {
       </View>
 
       {/* Bottom X-Axis for Time */}
-      <XAxis
-        style={{ height: 30 }}
-        data={times}
-        formatLabel={(value, index) =>
-          index % step === 3 ? formatDate(times[index]) : ""
-        }
-        contentInset={{ left: 30, right: 30 }}
-        svg={{ fontSize: 10, fill: "white" }}
-        scale={scale.scaleTime}
-      />
+      {time === DAY ? (
+        <XAxis
+          style={{ height: 30 }}
+          data={times}
+          formatLabel={(value, index) =>
+            index % step === 3 ? formatDate(times[index]) : ""
+          }
+          contentInset={{ left: 30, right: 30 }}
+          svg={{ fontSize: 10, fill: "white" }}
+          scale={scale.scaleTime}
+        />
+      ) : null}
     </View>
   );
 }
@@ -335,12 +337,21 @@ export function Graph() {
             </StyledPressable>
             <StyledPressable
               onPress={() => {
+                if (
+                  dataDentro.length < DAY * 1.1 ||
+                  dataFuera.length < DAY * 1.1
+                )
+                  return;
                 if (!(timePressed === WEEK)) {
                   setIsLoading("opacity-0");
                   setTimePressed(WEEK);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${timePressed === WEEK ? "bg-sky-900" : ""}`}
+              className={
+                dataDentro.length < DAY * 1.1 || dataFuera.length < DAY * 1.1
+                  ? "bg-orange-600 rounded-md"
+                  : `bg-sky-600 rounded-md ${timePressed === WEEK ? "bg-sky-900" : ""}`
+              }
             >
               {timePressed === WEEK && isLoading ? (
                 <>
@@ -357,12 +368,21 @@ export function Graph() {
             </StyledPressable>
             <StyledPressable
               onPress={() => {
+                if (
+                  dataDentro.length < WEEK * 1.1 ||
+                  dataFuera.length < WEEK * 1.1
+                )
+                  return;
                 if (!(timePressed === MONTH)) {
                   setIsLoading("opacity-0");
                   setTimePressed(MONTH);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${timePressed === MONTH ? "bg-sky-900" : ""}`}
+              className={
+                dataDentro.length < WEEK * 1.1 || dataFuera.length < WEEK * 1.1
+                  ? "bg-orange-600 rounded-md"
+                  : `bg-sky-600 rounded-md ${timePressed === MONTH ? "bg-sky-900" : ""}`
+              }
             >
               {timePressed === MONTH && isLoading ? (
                 <>
@@ -379,12 +399,22 @@ export function Graph() {
             </StyledPressable>
             <StyledPressable
               onPress={() => {
+                if (
+                  dataDentro.length < MONTH * 1.01 ||
+                  dataFuera.length < MONTH * 1.01
+                )
+                  return;
                 if (!(timePressed === YEAR)) {
                   setIsLoading("opacity-0");
                   setTimePressed(YEAR);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${timePressed === YEAR ? "bg-sky-900" : ""}`}
+              className={
+                dataDentro.length < MONTH * 1.01 ||
+                dataFuera.length < MONTH * 1.01
+                  ? "bg-orange-600 rounded-md"
+                  : `bg-sky-600 rounded-md ${timePressed === YEAR ? "bg-sky-900" : ""}`
+              }
             >
               {timePressed === YEAR && isLoading ? (
                 <>
@@ -401,12 +431,22 @@ export function Graph() {
             </StyledPressable>
             <StyledPressable
               onPress={() => {
+                if (
+                  dataDentro.length < YEAR * 1.01 ||
+                  dataFuera.length < YEAR * 1.01
+                )
+                  return;
                 if (!(timePressed === ALL)) {
                   setIsLoading("opacity-0");
                   setTimePressed(ALL);
                 }
               }}
-              className={`bg-sky-600 rounded-md ${timePressed === ALL ? "bg-sky-900" : ""}`}
+              className={
+                dataDentro.length < YEAR * 1.01 ||
+                dataFuera.length < YEAR * 1.01
+                  ? "bg-orange-600 rounded-md"
+                  : `bg-sky-600 rounded-md ${timePressed === ALL ? "bg-sky-900" : ""}`
+              }
             >
               {timePressed === ALL && isLoading ? (
                 <>
@@ -440,13 +480,3 @@ export function Graph() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5FCFF",
-  },
-  chart: {
-    flex: 1,
-  },
-});

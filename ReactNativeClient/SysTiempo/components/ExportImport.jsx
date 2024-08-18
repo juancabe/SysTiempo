@@ -6,6 +6,7 @@ import * as Sharing from "expo-sharing";
 import { Feather } from "@expo/vector-icons";
 
 import { useState, useEffect } from "react";
+import { DefaultTheme } from "@react-navigation/native";
 
 async function fillData(serverName, setData) {
   let availableKeys = [];
@@ -54,7 +55,33 @@ const saveAndShareJsonFile = async ({ dataFuera, dataDentro }) => {
   }
 };
 
-const downloadAndSave = async ({ dataFuera, dataDentro }) => {};
+const downloadAndSave = async ({ downloadUrl }) => {
+  try {
+    const response = await fetch(downloadUrl);
+    const data = await response.json();
+    if (data.fuera && data.dentro) {
+      data.fuera.forEach((datum) => {
+        AsyncStorage.setItem(
+          `esp8266fuera-${datum.time}`,
+          JSON.stringify(datum),
+        );
+      });
+      data.dentro.forEach((datum) => {
+        AsyncStorage.setItem(
+          `esp8266dentro-${datum.time}`,
+          JSON.stringify(datum),
+        );
+      });
+      return true;
+    } else {
+      console.error("JSON file does not contain the expected keys");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error downloading and saving the JSON file:", error);
+    return false;
+  }
+};
 
 export function ExportImport() {
   const [shareButton, setShareButton] = useState("bg-gray-800");
@@ -77,6 +104,19 @@ export function ExportImport() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const httpsUrlRegex =
+      /^https:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?$/i;
+
+    if (httpsUrlRegex.test(downloadUrl)) {
+      setIsLoadingDownload(false);
+      setDownloadButton("bg-white");
+    } else {
+      setIsLoadingDownload(true);
+      setDownloadButton("bg-gray-800");
+    }
+  }, [downloadUrl]);
 
   return (
     <View className="flex-1 justify-start">
@@ -107,8 +147,8 @@ export function ExportImport() {
       <View className="flex-row items-center justify-around py-20">
         <TextInput
           onChangeText={setDownloadUrl}
-          className="p-2 bg-white rounded-md text-black"
-          placeholder="URL del archivo JSON a importar..."
+          className="p-2 bg-white rounded-md text-black w-3/5 text-clip"
+          placeholder="ex: https://example.com/data.json"
           value={downloadUrl}
           autoCapitalize="none"
           autoCorrect={false}
@@ -129,8 +169,9 @@ export function ExportImport() {
           onPressOut={() => {
             if (downloadButton !== "bg-sky-800") return;
             setDownloadButton("bg-orange-400");
-            downloadAndSave({ dataFuera, dataDentro }).then(() => {
-              setDownloadButton("bg-green-600");
+            downloadAndSave({ downloadUrl }).then((resp) => {
+              if (resp) setDownloadButton("bg-green-600");
+              else setDownloadButton("bg-red-600");
             });
           }}
         >

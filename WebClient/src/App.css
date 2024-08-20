@@ -4,11 +4,11 @@
 
 /* styles.css */
 .containerLayout {
-  @apply w-screen -top-1;
+  @apply w-screen;
 }
 
 .inner-containerLayout {
-  @apply flex relative py-5 justify-center;
+  @apply flex py-5 justify-center;
 }
 
 .layoutButton {

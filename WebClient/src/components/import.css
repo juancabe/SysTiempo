@@ -1,0 +1,84 @@
+/* Container for the entire page */
+.import-container {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+
+/* Wrapper for the import box */
+.import-wrapper {
+  width: 50%;
+  max-width: 28rem;
+}
+
+/* Header styling */
+.import-header {
+  text-align: center;
+  font-size: 1.25rem;
+  padding: 1.25rem 0;
+}
+
+/* Main content container */
+.import-content {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Dropzone area padding */
+.import-dropzone {
+  padding: 2.5rem 0;
+}
+
+/* SVG icon styling */
+.import-icon {
+  margin-bottom: 1rem;
+  height: 2rem;
+  width: 2rem;
+  color: var(--gray-500);
+}
+
+/* Text description in the dropzone */
+.import-instruction {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+/* Additional text below instruction */
+.import-instruction-small {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+/* Uploaded file info */
+.import-file-info {
+  color: #000000;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+/* Image styling */
+.import-upload-icon {
+  height: 6rem;
+  width: 6rem;
+  margin: 0 auto;
+}
+
+/* No file uploaded message */
+.import-no-file {
+  color: var(--red-500);
+}
+
+/* Flex container for file details */
+.import-file-details {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+}
+
+.import-file-details:hover {
+  cursor: pointer;
+  background-color: #aaaa;
+}

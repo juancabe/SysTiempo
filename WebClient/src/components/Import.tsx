@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileInput, Label } from 'flowbite-react';
 import uploadSvg from '../assets/upload.svg';
+import { saveJsonToDB } from '../utils/saveJsonToDB';
 import './import.css'; // Import the CSS file
 
 interface ImportProps {
@@ -9,6 +10,7 @@ interface ImportProps {
 
 const Import: React.FC<ImportProps> = (props) => {
   const [inputFile, setInputFile] = useState<File | null>(null);
+  const [saveRes, setSaveRes] = useState<boolean | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0].name.endsWith('.json')) {
@@ -63,20 +65,24 @@ const Import: React.FC<ImportProps> = (props) => {
           </div>
           <div className="import-dropzone">
             {inputFile ? (
-              <div
-                className="import-file-details"
-                onClick={() => {
-                  // Save file to internal DB
-                }}
-              >
-                <span className="import-file-info">
-                  Save {inputFile.name} to internal DB
-                </span>
-                <img
-                  src={uploadSvg}
-                  alt="uploadIcon"
-                  className="import-upload-icon"
-                />
+              <div className="flex flex-row justify-center">
+                <div
+                  className="import-file-details"
+                  onClick={() => {
+                    saveJsonToDB(inputFile).then((res) => {
+                      setSaveRes(res);
+                    });
+                  }}
+                >
+                  <span className="import-file-info">
+                    Save {inputFile.name} to DB
+                  </span>
+                  <img
+                    src={uploadSvg}
+                    alt="uploadIcon"
+                    className="import-upload-icon"
+                  />
+                </div>
               </div>
             ) : (
               <span className="import-no-file">No file uploaded</span>

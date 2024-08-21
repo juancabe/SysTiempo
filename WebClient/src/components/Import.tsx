@@ -16,14 +16,20 @@ enum SaveRes {
 }
 
 const Import: React.FC<ImportProps> = (props) => {
-  const [inputFile, setInputFile] = useState<File | null>(null);
+  const [inputFile, setInputFile] = useState<File | SaveRes>(SaveRes.none);
   const [saveRes, setSaveRes] = useState<SaveRes>(SaveRes.none);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0].name.endsWith('.json')) {
+    if (
+      e &&
+      e.target &&
+      e.target.files &&
+      e.target.files[0].name &&
+      e.target.files[0].name.endsWith('.json')
+    ) {
       setInputFile(e.target.files[0]);
     } else {
-      setInputFile(null);
+      setInputFile(SaveRes.error);
     }
   };
 
@@ -71,7 +77,7 @@ const Import: React.FC<ImportProps> = (props) => {
             </Label>
           </div>
           <div className="import-dropzone">
-            {inputFile ? (
+            {inputFile instanceof File ? (
               <div className="flex flex-row justify-center">
                 <div
                   className={'import-file-details ' + saveRes}
@@ -98,7 +104,7 @@ const Import: React.FC<ImportProps> = (props) => {
                         ? 'Saved!'
                         : saveRes === SaveRes.error
                           ? 'Error! Try again'
-                          : `Save {inputFile.name} to DB`}
+                          : `Save ${inputFile.name} to DB`}
                   </span>
                   <img
                     src={uploadSvg}
@@ -107,8 +113,10 @@ const Import: React.FC<ImportProps> = (props) => {
                   />
                 </div>
               </div>
-            ) : (
+            ) : inputFile === SaveRes.none ? (
               <span className="import-no-file">No file uploaded</span>
+            ) : (
+              <span className="import-error">Invalid file type</span>
             )}
           </div>
         </div>

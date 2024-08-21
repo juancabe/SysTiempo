@@ -72,6 +72,10 @@
   color: var(--red-500);
 }
 
+.import-error {
+  color: #b70000;
+}
+
 /* Flex container for file details */
 .import-file-details {
   display: flex;
@@ -101,7 +105,10 @@
 
 @media (prefers-color-scheme: light) {
   .import-file-info {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0cf;
     color: #000;
+  }
+  .import-file-details.success {
+    background-color: #69be02;
   }
 }

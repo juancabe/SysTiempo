@@ -8,9 +8,16 @@ interface ImportProps {
   // define your props here
 }
 
+enum SaveRes {
+  loading = 'loading',
+  success = 'success',
+  error = 'error',
+  none = '',
+}
+
 const Import: React.FC<ImportProps> = (props) => {
   const [inputFile, setInputFile] = useState<File | null>(null);
-  const [saveRes, setSaveRes] = useState<boolean | null>(null);
+  const [saveRes, setSaveRes] = useState<SaveRes>(SaveRes.none);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0].name.endsWith('.json')) {
@@ -67,15 +74,31 @@ const Import: React.FC<ImportProps> = (props) => {
             {inputFile ? (
               <div className="flex flex-row justify-center">
                 <div
-                  className="import-file-details"
-                  onClick={() => {
-                    saveJsonToDB(inputFile).then((res) => {
-                      setSaveRes(res);
-                    });
+                  className={'import-file-details ' + saveRes}
+                  onClick={async () => {
+                    if (
+                      saveRes === SaveRes.loading ||
+                      saveRes === SaveRes.success
+                    )
+                      return;
+                    setSaveRes(SaveRes.loading);
+                    try {
+                      await saveJsonToDB(inputFile);
+                      setSaveRes(SaveRes.success);
+                    } catch (e) {
+                      console.error(e);
+                      setSaveRes(SaveRes.error);
+                    }
                   }}
                 >
                   <span className="import-file-info">
-                    Save {inputFile.name} to DB
+                    {saveRes === SaveRes.loading
+                      ? 'Saving...'
+                      : saveRes === SaveRes.success
+                        ? 'Saved!'
+                        : saveRes === SaveRes.error
+                          ? 'Error! Try again'
+                          : `Save {inputFile.name} to DB`}
                   </span>
                   <img
                     src={uploadSvg}

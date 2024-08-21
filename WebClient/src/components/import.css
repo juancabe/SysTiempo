@@ -78,11 +78,25 @@
   flex-direction: column;
   background-color: #cfcfcf;
   border-radius: 0.5rem;
+  min-width: 200px;
 }
 
 .import-file-details:hover {
   cursor: pointer;
   background-color: #aaaa;
+}
+
+/* className={'import-file-details ' + saveRes} */
+.import-file-details.success {
+  background-color: #437900;
+}
+
+.import-file-details.error {
+  background-color: #ffaaaa;
+}
+
+.import-file-details.loading {
+  background-color: #ffffaa;
 }
 
 @media (prefers-color-scheme: light) {

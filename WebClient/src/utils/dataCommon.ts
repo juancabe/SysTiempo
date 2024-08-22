@@ -29,3 +29,16 @@ export function isEspFile(data: any): data is EspFile {
     data.dentro.every(isEspData)
   );
 }
+
+export interface serverData {
+  placeName: string;
+  url: string;
+}
+
+export function isServerData(data: any): data is serverData {
+  return (
+    typeof data === 'object' &&
+    typeof data.placeName === 'string' &&
+    typeof data.url === 'string'
+  );
+}

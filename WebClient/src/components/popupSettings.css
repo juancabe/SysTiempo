@@ -1,0 +1,27 @@
+.popupSettings {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 2;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.879);
+  border-radius: 20px;
+  color: black;
+  @apply flex flex-col;
+}
+
+.setUrl {
+  @apply border border-black rounded-md p-3 m-1;
+}
+
+.urlInput {
+  background-color: rgb(236, 246, 255);
+  font-size: 0.775rem /* 14px */;
+  line-height: 1.05rem /* 20px */;
+  color: rgba(0, 0, 0, 0.527);
+  @apply p-[2px] mx-2 border border-black rounded-[4px];
+}
+
+.urlInput:focus {
+  color: rgba(0, 0, 0, 0.75);
+}

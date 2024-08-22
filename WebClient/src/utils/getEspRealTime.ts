@@ -41,10 +41,10 @@ function Utf8ArrayToStr(array: Array<number>) {
   return out;
 }
 
-export async function getEspRealTime(placeName: string, url: string) {
+export async function getEspRealTime(url: string) {
   try {
     const client = await getClient();
-    const response = await client.get(url, {
+    const response = await client.get(url + '/weather', {
       timeout: 30,
       responseType: ResponseType.Text,
     });

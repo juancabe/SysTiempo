@@ -4,6 +4,8 @@ import Export from './components/Export';
 import Import from './components/Import';
 import Graph from './components/Graph';
 import RealTime from './components/RealTime';
+import PopupSettings from './components/PopupSettings';
+
 import settingsSvg from './assets/settings.svg';
 
 enum ButSel {
@@ -15,11 +17,16 @@ enum ButSel {
 
 export default function App() {
   const [butSelState, setButSelState] = useState<ButSel>(ButSel.None);
+  const [settingsShown, setSettingsShown] = useState<boolean>(false);
   return (
     <>
       <div className="containerLayout p-4">
         <div className="flex justify-between items-center">
-          <div className="text-black">
+          {settingsShown ? <PopupSettings /> : null}
+          <div
+            className="text-black"
+            onClick={() => setSettingsShown(!settingsShown)}
+          >
             <img
               src={settingsSvg}
               alt="settings"

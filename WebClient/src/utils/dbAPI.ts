@@ -1,7 +1,8 @@
-import { EspData } from './dataCommon';
+import { EspData, serverData } from './dataCommon';
 
 const dbName = 'espData';
-const actualVersion = 1;
+const actualVersion = 3;
+const URLS_STORE_NAME = 'serverURLs';
 
 export function startDB(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -42,11 +43,81 @@ export function startDB(): Promise<void> {
         objectStore.createIndex('temp', 'temp', { unique: false });
         objectStore.createIndex('hum', 'hum', { unique: false });
       }
+      if (!db.objectStoreNames.contains(URLS_STORE_NAME)) {
+        console.log('[INFO] Creating object store: serverURLs');
+        db.createObjectStore(URLS_STORE_NAME, {
+          keyPath: 'placeName',
+        });
+      }
     };
 
     request.onblocked = (event: Event) => {
       reject(new Error('[USER_EXCEPT] Database blocked'));
     };
+  });
+}
+
+export function setURLForPlaceName(data: serverData): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const dbErrFunct = (event: Event) => {
+      const request = event.target as IDBOpenDBRequest;
+      reject(
+        new Error(`[USER_EXCEPT] Database error: ${request.error?.message}`),
+      );
+    };
+
+    let db: IDBDatabase | null = null;
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
+
+    request.onsuccess = (event: Event) => {
+      db = (event.target as IDBOpenDBRequest).result;
+      db.onerror = dbErrFunct;
+
+      const transaction = db.transaction(URLS_STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(URLS_STORE_NAME);
+      const request = store.put(data);
+      request.onsuccess = () => {
+        resolve(true);
+      };
+
+      request.onerror = () => {
+        resolve(false);
+      };
+    };
+
+    request.onerror = dbErrFunct;
+  });
+}
+
+export function getURLFromPlaceName(placeName: string): Promise<string | null> {
+  return new Promise((resolve, reject) => {
+    const dbErrFunct = (event: Event) => {
+      const request = event.target as IDBOpenDBRequest;
+      reject(
+        new Error(`[USER_EXCEPT] Database error: ${request.error?.message}`),
+      );
+    };
+
+    let db: IDBDatabase | null = null;
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
+
+    request.onsuccess = (event: Event) => {
+      db = (event.target as IDBOpenDBRequest).result;
+      db.onerror = dbErrFunct;
+
+      const transaction = db.transaction(URLS_STORE_NAME, 'readonly');
+      const store = transaction.objectStore(URLS_STORE_NAME);
+      const request = store.get(placeName);
+      request.onsuccess = () => {
+        resolve(request.result.url);
+      };
+
+      request.onerror = () => {
+        resolve(null);
+      };
+    };
+
+    request.onerror = dbErrFunct;
   });
 }
 

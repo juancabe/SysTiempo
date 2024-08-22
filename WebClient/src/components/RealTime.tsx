@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getEspRealTime } from '../utils/getEspRealTime';
+import { startDB, getURLFromPlaceName } from '../utils/dbAPI';
 import './realTime.css';
 
 interface RealTimeProps {
@@ -11,11 +12,11 @@ interface RealTimeState {
   humidity: string;
 }
 
-async function placeRealTime(placeName: string, url: string) {
+async function placeRealTime(url: string): Promise<RealTimeState | null> {
   let realTimeWeather = null;
 
-  await getEspRealTime(placeName, url).then((data) => {
-    if (!data) return;
+  await getEspRealTime(url).then((data) => {
+    if (!data || data.length !== 2) return null;
     realTimeWeather = {
       temp: data[0],
       humidity: data[1],
@@ -33,30 +34,53 @@ const RealTime: React.FC<RealTimeProps> = (props) => {
     null,
   );
 
-  useEffect(() => {
-    const placeName = 'fuera';
-    const url = 'http://192.168.1.132/weather';
+  const [urlFuera, setUrlFuera] = useState<string | null>(null);
+  const [urlDentro, setUrlDentro] = useState<string | null>(null);
 
+  const reloadURL = async (placeName: string) => {
+    if (placeName === 'fuera') {
+      setUrlFuera(await getURLFromPlaceName('fuera'));
+    } else {
+      setUrlDentro(await getURLFromPlaceName('dentro'));
+    }
+  };
+
+  useEffect(() => {
+    startDB();
+  }, []);
+
+  useEffect(() => {
+    reloadURL('fuera');
+    reloadURL('dentro');
+  }, []);
+
+  useEffect(() => {
     const fetchData = () => {
-      placeRealTime(placeName, url).then((data) => {
-        if (!data) return;
+      if (!urlFuera) return;
+      placeRealTime(urlFuera).then((data) => {
+        if (!data) {
+          setRealTimeFuera(null);
+          reloadURL('fuera');
+          return;
+        }
         setRealTimeFuera(data);
       });
     };
-
     fetchData(); // Fetch initially
     const intervalId = setInterval(fetchData, 10000); // Fetch every 10 seconds
 
     return () => clearInterval(intervalId); // Cleanup interval on unmount
-  }, []);
+  }, [urlFuera]);
 
   useEffect(() => {
-    const placeName = 'dentro';
-    const url = 'http://192.168.1.128/weather';
-
     const fetchData = () => {
-      placeRealTime(placeName, url).then((data) => {
-        if (!data) return;
+      if (!urlDentro) return;
+      placeRealTime(urlDentro).then((data) => {
+        if (!data) {
+          setRealTimeDentro(null);
+          reloadURL('dentro');
+          return;
+        }
         setRealTimeDentro(data);
       });
     };
@@ -65,7 +89,7 @@ const RealTime: React.FC<RealTimeProps> = (props) => {
     const intervalId = setInterval(fetchData, 10000); // Fetch every 10 seconds
 
     return () => clearInterval(intervalId); // Cleanup interval on unmount
-  }, []);
+  }, [urlDentro]);
 
   return (
     <div className="realTimeContainer">

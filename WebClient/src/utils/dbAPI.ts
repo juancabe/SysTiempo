@@ -1,10 +1,11 @@
 import { EspData } from './dataCommon';
 
 const dbName = 'espData';
+const actualVersion = 1;
 
 export function startDB(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const request: IDBOpenDBRequest = indexedDB.open(dbName, 1);
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
 
     request.onsuccess = (event: Event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -49,7 +50,7 @@ export function startDB(): Promise<void> {
   });
 }
 
-export function saveToDB(data: EspData[], storeName: string): void {
+export function saveToDBEspData(data: EspData[], storeName: string): void {
   const dbErrFunct = (event: Event) => {
     const request = event.target as IDBOpenDBRequest;
     throw new Error(`[USER_EXCEPT] Database error: ${request.error?.message}`);
@@ -57,7 +58,7 @@ export function saveToDB(data: EspData[], storeName: string): void {
 
   let db: IDBDatabase | null = null;
   // Open DB
-  const request: IDBOpenDBRequest = indexedDB.open(dbName, 1);
+  const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
 
   request.onsuccess = async (event: Event) => {
     db = (event.target as IDBOpenDBRequest).result;
@@ -121,5 +122,78 @@ function getLastTime(db: IDBDatabase, storeName: string): Promise<number> {
         ),
       );
     };
+  });
+}
+
+export function getFromTimeDB(
+  startTime: number,
+  storeName: string,
+): Promise<EspData[]> {
+  return new Promise((resolve, reject) => {
+    const dbErrFunct = (event: Event) => {
+      const request = event.target as IDBOpenDBRequest;
+      reject(
+        new Error(`[USER_EXCEPT] Database error: ${request.error?.message}`),
+      );
+    };
+
+    let db: IDBDatabase | null = null;
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
+
+    request.onsuccess = (event: Event) => {
+      db = (event.target as IDBOpenDBRequest).result;
+      db.onerror = dbErrFunct;
+
+      const transaction = db.transaction(storeName, 'readonly');
+      const store = transaction.objectStore(storeName);
+      const index = store.index('time');
+      const request = index.openCursor(IDBKeyRange.lowerBound(startTime));
+
+      const data: EspData[] = [];
+      request.onsuccess = (event: Event) => {
+        const cursor = (event.target as IDBRequest).result;
+        if (cursor) {
+          data.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(data);
+        }
+      };
+
+      request.onerror = dbErrFunct;
+    };
+
+    request.onerror = dbErrFunct;
+  });
+}
+
+export function getAllEspData(storeName: string): Promise<EspData[]> {
+  return new Promise((resolve, reject) => {
+    const dbErrFunct = (event: Event) => {
+      const request = event.target as IDBOpenDBRequest;
+      reject(
+        new Error(`[USER_EXCEPT] Database error: ${request.error?.message}`),
+      );
+    };
+
+    let db: IDBDatabase | null = null;
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
+
+    request.onsuccess = (event: Event) => {
+      db = (event.target as IDBOpenDBRequest).result;
+      db.onerror = dbErrFunct;
+
+      const transaction = db.transaction(storeName, 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+
+      request.onsuccess = (event: Event) => {
+        resolve((event.target as IDBRequest).result);
+      };
+
+      request.onerror = dbErrFunct;
+    };
+
+    request.onerror = dbErrFunct;
   });
 }

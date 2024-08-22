@@ -13,6 +13,7 @@
 
 .layoutButton {
   @apply border-[#242424] mx-2 px-3 py-1 rounded-3xl bg-white/[.10] border-2;
+  filter: drop-shadow(0 0 6px #ffffff4d);
 }
 
 .selected {
@@ -30,6 +31,10 @@
   @apply text-lg text-center;
 }
 
+.settings {
+  filter: drop-shadow(0 0 6px #ffffff) drop-shadow(0 0 6px #ffffff3c);
+}
+
 @media (prefers-color-scheme: light) {
   .inner-containerLayout {
     @apply bg-[#ffffff];
@@ -37,5 +42,12 @@
 
   .layoutButton {
     @apply border-[#757575];
+  }
+
+  .layoutButton {
+    filter: drop-shadow(0 0 6px #070707b2);
+  }
+  .settings {
+    filter: drop-shadow(0 0 16px #000000c7) drop-shadow(0 0 16px #ffffff3c);
   }
 }

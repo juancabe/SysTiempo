@@ -1,5 +1,5 @@
 import { EspFile, isEspFile } from './dataCommon';
-import { saveToDB, startDB } from './dbAPI';
+import { saveToDBEspData, startDB } from './dbAPI';
 
 export async function saveJsonToDB(file: File) {
   // Read the file structured content
@@ -16,6 +16,6 @@ export async function saveJsonToDB(file: File) {
   // DATABASE INIT
   await startDB();
   // Save data to database
-  saveToDB(parsedFile.fuera, 'fuera');
-  saveToDB(parsedFile.dentro, 'dentro');
+  saveToDBEspData(parsedFile.fuera, 'fuera');
+  saveToDBEspData(parsedFile.dentro, 'dentro');
 }

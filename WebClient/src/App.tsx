@@ -3,6 +3,8 @@ import './App.css';
 import Export from './components/Export';
 import Import from './components/Import';
 import Graph from './components/Graph';
+import RealTime from './components/RealTime';
+import settingsSvg from './assets/settings.svg';
 
 enum ButSel {
   None,
@@ -15,38 +17,58 @@ export default function App() {
   const [butSelState, setButSelState] = useState<ButSel>(ButSel.None);
   return (
     <>
-      <div className="containerLayout">
-        <div className="inner-containerLayout">
-          <button
-            onClick={() =>
-              butSelState !== ButSel.Import
-                ? setButSelState(ButSel.Import)
-                : null
-            }
-            className={`layoutButton${butSelState === ButSel.Import ? ' selected ' : ' '}
+      <div className="containerLayout p-4">
+        <div className="flex justify-between items-center">
+          <div className="text-black">
+            <img
+              src={settingsSvg}
+              alt="settings"
+              className="settings w-10 h-10"
+            />
+          </div>
+
+          <div className="inner-containerLayout">
+            <button
+              onClick={() =>
+                butSelState !== ButSel.Import
+                  ? setButSelState(ButSel.Import)
+                  : null
+              }
+              className={`layoutButton${butSelState === ButSel.Import ? ' selected ' : ' '}
             first-layoutButton`}
-          >
-            <h1 className="heading">Import</h1>
-          </button>
-          <button
-            onClick={() =>
-              butSelState !== ButSel.Export
-                ? setButSelState(ButSel.Export)
-                : null
-            }
-            className={`layoutButton${butSelState === ButSel.Export ? ' selected ' : ' '}
+            >
+              <h1 className="heading">Import</h1>
+            </button>
+            <button
+              onClick={() =>
+                butSelState !== ButSel.Export
+                  ? setButSelState(ButSel.Export)
+                  : null
+              }
+              className={`layoutButton${butSelState === ButSel.Export ? ' selected ' : ' '}
             middle-layoutButton`}
-          >
-            <h1 className="heading">Export</h1>
-          </button>
-          <button
-            onClick={() =>
-              butSelState !== ButSel.Graph ? setButSelState(ButSel.Graph) : null
-            }
-            className={`layoutButton${butSelState === ButSel.Graph ? ' selected ' : ' '} last-layoutButton`}
-          >
-            <h1 className="heading">Graph</h1>
-          </button>
+            >
+              <h1 className="heading">Export</h1>
+            </button>
+            <button
+              onClick={() =>
+                butSelState !== ButSel.Graph
+                  ? setButSelState(ButSel.Graph)
+                  : null
+              }
+              className={`layoutButton${butSelState === ButSel.Graph ? ' selected ' : ' '} last-layoutButton`}
+            >
+              <h1 className="heading">Graph</h1>
+            </button>
+          </div>
+          <img
+            src={settingsSvg}
+            alt="settings"
+            className="invisible w-10 h-10"
+          />
+        </div>
+        <div>
+          <RealTime />
         </div>
       </div>
       {butSelState === ButSel.Import ? (
@@ -54,7 +76,9 @@ export default function App() {
       ) : butSelState === ButSel.Export ? (
         <Export />
       ) : butSelState === ButSel.Graph ? (
-        <Graph />
+        <div className="p-10">
+          <Graph />
+        </div>
       ) : null}
     </>
   );

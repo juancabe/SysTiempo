@@ -1,0 +1,30 @@
+.realTimeContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.realTimeCard {
+  filter: drop-shadow(0 0 35px #007bff) drop-shadow(0 0 55px #007bff);
+  margin: 0.75rem;
+  border-radius: 1.5rem;
+  border: 1px solid #38bdf8; /* Sky-600 */
+  display: flex;
+  flex-direction: row;
+  background-color: #ffffff08; /* Slightly transparent white */
+}
+
+.realTimeData {
+  padding: 0.75rem;
+}
+
+.realTimeDivider {
+  border-left: 1px solid #38bdf8; /* Sky-600 */
+}
+
+.realTimeTemp {
+  color: #f87171; /* Red-400 */
+}
+
+.realTimeHumidity {
+  color: #60a5fa; /* Blue-400 */
+}

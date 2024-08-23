@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getEspRealTime } from '../utils/getEspRealTime';
+import { getEspRealTime, getEspFromLTime } from '../utils/getEsp';
 import { startDB, getURLFromPlaceName } from '../utils/dbAPI';
 import './realTime.css';
 
@@ -26,7 +26,7 @@ async function placeRealTime(url: string): Promise<RealTimeState | null> {
   return realTimeWeather;
 }
 
-const RealTime: React.FC<RealTimeProps> = (props) => {
+const RealTime: React.FC<RealTimeProps> = () => {
   const [realTimeFuera, setRealTimeFuera] = useState<RealTimeState | null>(
     null,
   );

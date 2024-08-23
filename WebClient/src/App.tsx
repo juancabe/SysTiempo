@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
-import Export from './components/Export';
+import DownloadData from './components/DownloadData';
 import Import from './components/Import';
 import Graph from './components/Graph';
 import RealTime from './components/RealTime';
 import PopupSettings from './components/PopupSettings';
 
 import settingsSvg from './assets/settings.svg';
+import xSettingsSvg from './assets/x.svg';
 
 enum ButSel {
   None,
@@ -18,6 +19,8 @@ enum ButSel {
 export default function App() {
   const [butSelState, setButSelState] = useState<ButSel>(ButSel.None);
   const [settingsShown, setSettingsShown] = useState<boolean>(false);
+
+  useEffect(() => {}, [settingsShown]);
   return (
     <>
       <div className="containerLayout p-4">
@@ -27,11 +30,11 @@ export default function App() {
             className="text-black"
             onClick={() => setSettingsShown(!settingsShown)}
           >
-            <img
-              src={settingsSvg}
-              alt="settings"
-              className="settings w-10 h-10"
-            />
+            {settingsShown ? (
+              <img src={xSettingsSvg} alt="settings" className={'settings'} />
+            ) : (
+              <img src={settingsSvg} alt="settings" className={'settings'} />
+            )}
           </div>
 
           <div className="inner-containerLayout">
@@ -81,7 +84,7 @@ export default function App() {
       {butSelState === ButSel.Import ? (
         <Import />
       ) : butSelState === ButSel.Export ? (
-        <Export />
+        <DownloadData />
       ) : butSelState === ButSel.Graph ? (
         <div className="p-10">
           <Graph />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FileInput, Label } from 'flowbite-react';
 import uploadSvg from '../assets/upload.svg';
 import { saveJsonToDB } from '../utils/saveJsonToDB';
@@ -15,7 +15,7 @@ enum SaveRes {
   none = '',
 }
 
-const Import: React.FC<ImportProps> = (props) => {
+const Import: React.FC<ImportProps> = () => {
   const [inputFile, setInputFile] = useState<File | SaveRes>(SaveRes.none);
   const [saveRes, setSaveRes] = useState<SaveRes>(SaveRes.none);
 

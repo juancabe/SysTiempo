@@ -51,7 +51,7 @@ export function startDB(): Promise<void> {
       }
     };
 
-    request.onblocked = (event: Event) => {
+    request.onblocked = () => {
       reject(new Error('[USER_EXCEPT] Database blocked'));
     };
   });
@@ -186,7 +186,7 @@ function getLastTime(db: IDBDatabase, storeName: string): Promise<number> {
       }
     };
 
-    request.onerror = (event: Event) => {
+    request.onerror = () => {
       reject(
         new Error(
           `[USER_EXCEPT] Failed to retrieve last time: ${request.error?.message}`,

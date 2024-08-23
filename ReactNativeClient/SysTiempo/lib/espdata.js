@@ -111,7 +111,7 @@ export async function getEspData({ Burl, lastTime }) {
     if (dataIT.first.index <= dataIT.last.index) {
       console.log("dataIT.first.index: ", dataIT.first.index);
       console.log("dataIT.last.index: ", dataIT.last.index);
-      for (let i = dataIT.first.index; i < dataIT.last.index; i++) {
+      for (let i = dataIT.first.index; i <= dataIT.last.index; i++) {
         try {
           const urlIs = url + path + i;
           //console.log("Fetching data from:", urlIs);
@@ -132,7 +132,7 @@ export async function getEspData({ Burl, lastTime }) {
         console.log("Data:", dataItems);
         maxItems = dataItems.maxItems;
       } catch (e) {
-        console.log("TODO: /weathervectoritems | ", e);
+        console.log("/weathervectoritems | ", e);
       }
       if (maxItems < 0) {
         msg = "No data";

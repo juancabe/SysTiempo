@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import { getAllEspData } from '../utils/dbAPI';
 import { EspData } from '../utils/dataCommon';
 import {
@@ -10,6 +10,7 @@ import {
   CrossHairCursor,
   withDeviceRatio,
   withSize,
+  HoverTooltip,
 } from 'react-financial-charts';
 import { scaleTime, scaleLinear } from 'd3-scale';
 import './graph.css';
@@ -23,36 +24,6 @@ interface PlaceGraphProps {
   width: number;
   height: number;
   ratio: number;
-}
-
-enum timePrecision {
-  MINUTE,
-  HOUR,
-  DAY,
-  MONTH,
-  YEAR,
-}
-
-function formatTime(time: number, prec: timePrecision): string {
-  const date = new Date(time * 1000);
-  const hours: string = date.getHours().toString().padStart(2, '0');
-  const minutes: number = date.getMinutes();
-  const day: string = date.getDate().toString().padStart(2, '0');
-  const month: string = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year: number = date.getFullYear() % 2000;
-
-  switch (prec) {
-    case timePrecision.MINUTE:
-      return `${minutes.toString().padStart(2, '0')}`;
-    case timePrecision.HOUR:
-      return `${hours}:${minutes.toString().padStart(2, '0')}`;
-    case timePrecision.DAY:
-      return `${hours}:${(~~(minutes / 10) * 10).toString().padStart(2, '0')} ${day}/${month}`;
-    case timePrecision.MONTH:
-      return `${day} ${month}/${year}}`;
-    case timePrecision.YEAR:
-      return `${month}/${year}`;
-  }
 }
 
 const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
@@ -74,18 +45,22 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
   const xAccessor = (d: EspData) => new Date(d.time * 1000);
   const yAccessorTemp = (d: EspData) => d.temp;
   const yAccessorHum = (d: EspData) => d.hum;
+  const xExtentss = [xAccessor(data[0]), xAccessor(data[data.length - 1])];
 
   return (
     <ChartCanvas
       height={props.height}
       width={props.width}
       ratio={props.ratio}
-      margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
+      margin={{ left: 30, right: 30, top: 10, bottom: 30 }}
       data={data}
       seriesName="Place Data"
       xScale={scaleTime()}
       xAccessor={xAccessor}
       displayXAccessor={xAccessor}
+      xExtents={xExtentss}
+      clamp="both"
+      maintainPointsPerPixelOnResize={false}
     >
       <Chart id={0} yScale={scaleLinear()} yExtents={yAccessorTemp}>
         <XAxis />
@@ -96,7 +71,7 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
         id={1}
         yScale={scaleLinear()}
         yExtents={yAccessorHum}
-        origin={(w, h) => [0, 0]} // Aligns the second chart on top of the first one
+        origin={() => [0, 0]} // Aligns the second chart on top of the first one
       >
         <YAxis axisAt="right" orient="right" />
         <LineSeries yAccessor={yAccessorHum} strokeStyle="blue" />
@@ -107,11 +82,18 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
 };
 
 // Wrap PlaceGraphComponent with withSize and withDeviceRatio for responsiveness
-const PlaceGraph = withSize({ style: { minHeight: 300, maxWidth: 500 } })(
-  withDeviceRatio()(PlaceGraphComponent),
+
+class PlaceGraphComponentWrapper extends Component<PlaceGraphProps> {
+  render() {
+    return <PlaceGraphComponent {...this.props} />;
+  }
+}
+
+const PlaceGraph = withSize({ style: { minHeight: 300, width: '100%' } })(
+  withDeviceRatio()(PlaceGraphComponentWrapper),
 );
 
-const Graph: React.FC<GraphProps> = (props) => {
+const Graph: React.FC<GraphProps> = () => {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -119,7 +101,8 @@ const Graph: React.FC<GraphProps> = (props) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      if (windowSize)
+        setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     };
 
     window.addEventListener('resize', handleResize);
@@ -133,27 +116,20 @@ const Graph: React.FC<GraphProps> = (props) => {
   const placeNames = ['fuera', 'dentro'];
 
   return (
-    <div className="text-center flex flex-col mx-5 max-w-100">
-      <h1 className="text-3xl pb-6">Graph</h1>
-      {/* map for each placeName */}
+    <div className="graph-container">
+      <h1 className="graph-title">Graph</h1>
       {placeNames.map((placeName) => (
         <>
-          <div className="flex flex-row justify-between pt-6">
-            <div className="pl-1 flex flex-col justify-end">
-              <p className="bg-[#ff3b3b] rounded-t-md text-sm text-[#000000] p-1">
-                Temperatura
-              </p>
+          <div className="place-header">
+            <div className="temperature-label-container">
+              <p className="temperature-label">Temperatura</p>
             </div>
-            <p className=" p-3 bg-[#c3c3c3] rounded-t-md text-[#000000]">
-              {placeName.toLocaleUpperCase()}
-            </p>
-            <div className="pr-7 flex flex-col justify-end">
-              <p className="bg-[#3b5bff] rounded-t-md text-sm text-[#000000] p-1">
-                Humedad
-              </p>
+            <p className="place-name">{placeName.toLocaleUpperCase()}</p>
+            <div className="humidity-label-container">
+              <p className="humidity-label">Humedad</p>
             </div>
           </div>
-          <div className="bg-[#e9e9e9] rounded-md max-w-100">
+          <div className="place-graph-container">
             <PlaceGraph placeName={placeName} />
           </div>
         </>

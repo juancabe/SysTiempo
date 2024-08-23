@@ -10,7 +10,6 @@ import {
   CrossHairCursor,
   withDeviceRatio,
   withSize,
-  HoverTooltip,
 } from 'react-financial-charts';
 import { scaleTime, scaleLinear } from 'd3-scale';
 import './graph.css';
@@ -18,12 +17,40 @@ import './graph.css';
 interface GraphProps {
   // define your props here
 }
-
+enum MaxTime {
+  Day,
+  Week,
+  Month,
+  Year,
+  All,
+}
 interface PlaceGraphProps {
   placeName: string;
+  maxTime: MaxTime;
   width: number;
   height: number;
   ratio: number;
+}
+
+function cropData(
+  data: EspData[],
+  maxTime: MaxTime,
+  lastTime: number,
+): EspData[] {
+  let dataCopy = [...data];
+
+  switch (maxTime) {
+    case MaxTime.Day:
+      return dataCopy.filter((d) => d.time > lastTime - 24 * 60 * 60);
+    case MaxTime.Week:
+      return dataCopy.filter((d) => d.time > lastTime - 7 * 24 * 60 * 60);
+    case MaxTime.Month:
+      return dataCopy.filter((d) => d.time > lastTime - 30 * 24 * 60 * 60);
+    case MaxTime.Year:
+      return dataCopy.filter((d) => d.time > lastTime - 365 * 24 * 60 * 60);
+    case MaxTime.All:
+      return dataCopy;
+  }
 }
 
 const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
@@ -31,9 +58,6 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
 
   useEffect(() => {
     getAllEspData(props.placeName).then((data) => {
-      console.log(
-        `Adding ${data.length} data points, a random one is ${data[Math.floor(Math.random() * data.length)].temp}`,
-      );
       setData(data);
     });
   }, [props.placeName]);
@@ -53,7 +77,7 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
       width={props.width}
       ratio={props.ratio}
       margin={{ left: 30, right: 30, top: 10, bottom: 30 }}
-      data={data}
+      data={cropData(data, props.maxTime, data[data.length - 1].time)}
       seriesName="Place Data"
       xScale={scaleTime()}
       xAccessor={xAccessor}
@@ -64,7 +88,7 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
     >
       <Chart id={0} yScale={scaleLinear()} yExtents={yAccessorTemp}>
         <XAxis />
-        <YAxis axisAt="left" orient="left" />
+        <YAxis axisAt="left" orient="left" ticks={10} />
         <LineSeries yAccessor={yAccessorTemp} strokeStyle="red" />
       </Chart>
       <Chart
@@ -73,7 +97,7 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
         yExtents={yAccessorHum}
         origin={() => [0, 0]} // Aligns the second chart on top of the first one
       >
-        <YAxis axisAt="right" orient="right" />
+        <YAxis axisAt="right" orient="right" ticks={10} />
         <LineSeries yAccessor={yAccessorHum} strokeStyle="blue" />
       </Chart>
       <CrossHairCursor />
@@ -98,6 +122,8 @@ const Graph: React.FC<GraphProps> = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [placeSelected, setPlaceSelected] = useState<Array<string>>(['fuera']);
+  const [maxTime, setMaxTime] = useState<MaxTime>(MaxTime.Day);
 
   useEffect(() => {
     const handleResize = () => {
@@ -113,12 +139,71 @@ const Graph: React.FC<GraphProps> = () => {
     };
   }, []);
 
-  const placeNames = ['fuera', 'dentro'];
-
   return (
     <div className="graph-container">
-      <h1 className="graph-title">Graph</h1>
-      {placeNames.map((placeName) => (
+      <div className="inner-containerLayout">
+        <button
+          className={
+            'layoutButton' +
+            (placeSelected.includes('fuera') ? ' selected' : '')
+          }
+          onClick={() => setPlaceSelected(['fuera'])}
+        >
+          <p>Fuera</p>
+        </button>
+        <button
+          className={
+            'layoutButton' +
+            (placeSelected.includes('dentro') ? ' selected' : '')
+          }
+          onClick={() => setPlaceSelected(['dentro'])}
+        >
+          <p>Dentro</p>
+        </button>
+      </div>
+      <div className="inner-containerLayout">
+        <button
+          className={
+            'layoutButton' + (maxTime === MaxTime.Day ? ' selected' : '')
+          }
+          onClick={() => setMaxTime(MaxTime.Day)}
+        >
+          <p>Day</p>
+        </button>
+        <button
+          className={
+            'layoutButton' + (maxTime === MaxTime.Week ? ' selected' : '')
+          }
+          onClick={() => setMaxTime(MaxTime.Week)}
+        >
+          <p>Week</p>
+        </button>
+        <button
+          className={
+            'layoutButton' + (maxTime === MaxTime.Month ? ' selected' : '')
+          }
+          onClick={() => setMaxTime(MaxTime.Month)}
+        >
+          <p>Month</p>
+        </button>
+        <button
+          className={
+            'layoutButton' + (maxTime === MaxTime.Year ? ' selected' : '')
+          }
+          onClick={() => setMaxTime(MaxTime.Year)}
+        >
+          <p>Year</p>
+        </button>
+        <button
+          className={
+            'layoutButton' + (maxTime === MaxTime.All ? ' selected' : '')
+          }
+          onClick={() => setMaxTime(MaxTime.All)}
+        >
+          <p>All</p>
+        </button>
+      </div>
+      {placeSelected.map((placeName) => (
         <>
           <div className="place-header">
             <div className="temperature-label-container">
@@ -130,7 +215,7 @@ const Graph: React.FC<GraphProps> = () => {
             </div>
           </div>
           <div className="place-graph-container">
-            <PlaceGraph placeName={placeName} />
+            <PlaceGraph placeName={placeName} maxTime={maxTime} />
           </div>
         </>
       ))}

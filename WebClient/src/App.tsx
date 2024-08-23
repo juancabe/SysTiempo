@@ -58,7 +58,7 @@ export default function App() {
               className={`layoutButton${butSelState === ButSel.Export ? ' selected ' : ' '}
             middle-layoutButton`}
             >
-              <h1 className="heading">Export</h1>
+              <h1 className="heading">Download</h1>
             </button>
             <button
               onClick={() =>

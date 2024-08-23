@@ -1,4 +1,5 @@
 import { EspData, serverData } from './dataCommon';
+import { getEspFromLTime } from './getEsp';
 
 const dbName = 'espData';
 const actualVersion = 3;
@@ -118,6 +119,65 @@ export function getURLFromPlaceName(placeName: string): Promise<string | null> {
     };
 
     request.onerror = dbErrFunct;
+  });
+}
+
+export function getSaveEspData(placeName: string): Promise<string> {
+  return new Promise<string>((resolve) => {
+    const dbErrFunct = () => {
+      resolve('Failed to save data.');
+      return;
+    };
+
+    let db: IDBDatabase | null = null;
+    // Open DB
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
+
+    request.onsuccess = async (event: Event) => {
+      db = (event.target as IDBOpenDBRequest).result;
+      db.onerror = dbErrFunct;
+
+      // Retrieve the last time asynchronously
+      const lastTime = await getLastTime(db, placeName);
+      // Retrieve the serverData that contains the URL
+      const url = await getURLFromPlaceName(placeName);
+      if (!url) {
+        resolve('Failed to get url from internal database.');
+        return;
+      }
+
+      // Get data from server
+      const data = await getEspFromLTime(lastTime, { placeName, url });
+      if (!data) {
+        resolve('No data downloaded');
+        return;
+      }
+
+      // Save data after lastTime is retrieved
+      const transaction = db.transaction(placeName, 'readwrite');
+      const writeStore = transaction.objectStore(placeName);
+      data.forEach((element) => {
+        if (element.time > lastTime) {
+          writeStore.add(element);
+        }
+      });
+      resolve(data.length + ' item(s) saved.');
+    };
+
+    request.onerror = dbErrFunct;
+
+    request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+      db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(placeName)) {
+        console.log(`[INFO] Creating object store: ${placeName}`);
+        const objectStore = db.createObjectStore(placeName, {
+          keyPath: 'time',
+        });
+        objectStore.createIndex('time', 'time', { unique: false });
+        objectStore.createIndex('temp', 'temp', { unique: false });
+        objectStore.createIndex('hum', 'hum', { unique: false });
+      }
+    };
   });
 }
 

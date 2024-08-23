@@ -75,7 +75,7 @@ export async function getEspFromLTime(
       },
     );
     lastTimeIndex = JSON.parse(response.data as string).index;
-    if (lastTimeIndex === -1) lastTimeIndex = indexesNTImes.first.index;
+    if (lastTimeIndex === -1) lastTimeIndex = indexesNTImes.first.index - 1;
     else if (!(lastTimeIndex >= 0 && lastTimeIndex < vectorLength))
       throw '(d)-Invalid lastTimeIndex';
   } catch (e) {

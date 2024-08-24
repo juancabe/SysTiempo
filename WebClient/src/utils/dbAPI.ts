@@ -8,7 +8,6 @@ const URLS_STORE_NAME = 'serverURLs';
 export function startDB(): Promise<void> {
   return new Promise((resolve, reject) => {
     const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
-
     request.onsuccess = (event: Event) => {
       const db = (event.target as IDBOpenDBRequest).result;
       db.onerror = (event: Event) => {
@@ -138,7 +137,7 @@ export function getSaveEspData(placeName: string): Promise<string> {
       db.onerror = dbErrFunct;
 
       // Retrieve the last time asynchronously
-      const lastTime = await getLastTime(db, placeName);
+      const lastTime = await getLastTime_ne(db, placeName);
       // Retrieve the serverData that contains the URL
       const url = await getURLFromPlaceName(placeName);
       if (!url) {
@@ -204,7 +203,7 @@ export function saveToDBEspData(data: EspData[], storeName: string): void {
     }
 
     // Retrieve the last time asynchronously
-    const lastTime = await getLastTime(db, storeName);
+    const lastTime = await getLastTime_ne(db, storeName);
 
     // Save data after lastTime is retrieved
     const transaction = db.transaction(storeName, 'readwrite');
@@ -230,7 +229,25 @@ export function saveToDBEspData(data: EspData[], storeName: string): void {
   };
 }
 
-function getLastTime(db: IDBDatabase, storeName: string): Promise<number> {
+export async function getLastTime(placeName: string): Promise<number> {
+  startDB();
+
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request: IDBOpenDBRequest = indexedDB.open(dbName, actualVersion);
+
+    request.onsuccess = (event: Event) => {
+      resolve((event.target as IDBOpenDBRequest).result);
+    };
+
+    request.onerror = () => {
+      reject(0);
+    };
+  });
+
+  return getLastTime_ne(db, placeName);
+}
+
+function getLastTime_ne(db: IDBDatabase, storeName: string): Promise<number> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(storeName, 'readonly');
     const store = transaction.objectStore(storeName);

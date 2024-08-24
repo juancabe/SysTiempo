@@ -1,5 +1,6 @@
 import { getClient, ResponseType, Client } from '@tauri-apps/api/http';
 import { serverData, EspData } from './dataCommon';
+import { SetStateAction } from 'react';
 
 export async function getEspFromLTime(
   lastTime: number,
@@ -155,10 +156,35 @@ async function getEspDataFromIndex(
     return null;
   }
 }
-
-export async function getEspURLFromPlaceName(
+export const doUrlRequest = async (
+  ip: number,
+  client: Client,
   placeNames: string[],
-): Promise<(string | null)[]> {
+  returnUrls: (string | null)[],
+  localUrl: string,
+  incrementWhenDone: (value: SetStateAction<number>) => void,
+): Promise<boolean> => {
+  try {
+    const response = await client.get(localUrl + ip, {
+      timeout: 5,
+      responseType: ResponseType.Text,
+    });
+    const stringResponse = response.data as string;
+    for (let i = 0; i < placeNames.length; i++) {
+      if (stringResponse.includes(placeNames[i])) returnUrls[i] = localUrl + ip;
+    }
+    incrementWhenDone((prevCount) => prevCount + 1);
+    return true;
+  } catch (e) {
+    incrementWhenDone((prevCount) => prevCount + 1);
+    return false;
+  }
+};
+
+export const getEspURLFromPlaceName = async (
+  placeNames: string[],
+  incrementFn: (value: React.SetStateAction<number>) => void,
+): Promise<(string | null)[]> => {
   const localUrl: string = 'http://192.168.1.';
   const client: Client = await getClient();
 
@@ -166,31 +192,15 @@ export async function getEspURLFromPlaceName(
 
   console.log('hey hey');
 
-  const doRequest = async (ip: number): Promise<boolean> => {
-    console.log('Promise ' + ip + ' doing things');
-    try {
-      const response = await client.get(localUrl + ip, {
-        timeout: 30,
-        responseType: ResponseType.Text,
-      });
-      const stringResponse = response.data as string;
-      for (let i = 0; i < placeNames.length; i++) {
-        if (stringResponse.includes(placeNames[i]))
-          returnUrls[i] = localUrl + ip;
-      }
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
   let promises: Promise<boolean>[] = [];
 
   for (let i = 0; i < 256; i++) {
-    promises.push(doRequest(i));
+    promises.push(
+      doUrlRequest(i, client, placeNames, returnUrls, localUrl, incrementFn),
+    );
   }
 
   await Promise.all(promises);
 
   return returnUrls;
-}
+};

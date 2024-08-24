@@ -1,27 +1,85 @@
 .popupSettings {
   position: absolute;
-  top: 80px;
-  left: 20px;
+  top: 78px;
+  left: 6px;
   z-index: 2;
-  padding: 10px;
   background-color: rgba(255, 255, 255, 0.879);
-  border-radius: 20px;
+  border-radius: 12px;
   color: black;
-  @apply flex flex-col;
+  @apply flex flex-col border-[#00000083] border-2;
 }
 
 .setUrl {
-  @apply border border-black rounded-md p-3 m-1;
+  @apply rounded-md p-3 text-left bg-[#00000011];
+}
+
+.loader.loading {
+  animation: rotate-center 2s linear infinite;
+}
+
+@keyframes rotate-center {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader.loaded {
+  @apply opacity-65;
+}
+
+.urlHeader {
+  @apply pb-3;
+}
+
+.setURL-container {
+  @apply text-center py-3;
+  /* if other setURL-container below, add bottom border */
+}
+
+.inputTitle {
+  @apply border-t-2 border-l-2 border-r-2 px-2 border-[#00000083] bg-[#00000011];
+}
+
+.setURL-container:first-child {
+  @apply border-b-2 border-[#00000083];
+}
+
+.urlInputContainer {
+  @apply flex border-2 border-[#00000083];
+}
+.urlInputButton {
+  background-color: rgba(0, 0, 0, 0.192);
+  @apply px-2;
+}
+.urlInputButton:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.urlInputButton:active {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .urlInput {
-  background-color: rgb(236, 246, 255);
   font-size: 0.775rem /* 14px */;
   line-height: 1.05rem /* 20px */;
   color: rgba(0, 0, 0, 0.527);
-  @apply p-[2px] mx-2 border border-black rounded-[4px];
+  border: white;
+  @apply pr-2 py-2;
 }
 
 .urlInput:focus {
   color: rgba(0, 0, 0, 0.75);
+}
+
+.lookupButton {
+  @apply rounded-md;
+}
+
+.lookupButton:hover {
+  background-color: rgba(0, 0, 0, 0.373);
+}
+
+@media (prefers-color-scheme: light) {
 }

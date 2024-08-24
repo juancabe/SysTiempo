@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getEspRealTime, getEspFromLTime } from '../utils/getEsp';
+import { getEspRealTime } from '../utils/getEsp';
 import { startDB, getURLFromPlaceName } from '../utils/dbAPI';
 import './realTime.css';
 
@@ -104,7 +104,7 @@ const RealTime: React.FC<RealTimeProps> = () => {
               </span>
             </span>
           ) : (
-            'Loading...'
+            'Loading, try to reload URLs.'
           )}
         </p>
         <p className="realTimeData realTimeDivider">

@@ -13,44 +13,18 @@ import {
 } from 'react-financial-charts';
 import { scaleTime, scaleLinear } from 'd3-scale';
 import './graph.css';
+import { smoothData, cropData, MaxTime } from '../utils/manageEspData';
 
 interface GraphProps {
   // define your props here
 }
-enum MaxTime {
-  Day,
-  Week,
-  Month,
-  Year,
-  All,
-}
+
 interface PlaceGraphProps {
   placeName: string;
   maxTime: MaxTime;
   width: number;
   height: number;
   ratio: number;
-}
-
-function cropData(
-  data: EspData[],
-  maxTime: MaxTime,
-  lastTime: number,
-): EspData[] {
-  let dataCopy = [...data];
-
-  switch (maxTime) {
-    case MaxTime.Day:
-      return dataCopy.filter((d) => d.time > lastTime - 24 * 60 * 60);
-    case MaxTime.Week:
-      return dataCopy.filter((d) => d.time > lastTime - 7 * 24 * 60 * 60);
-    case MaxTime.Month:
-      return dataCopy.filter((d) => d.time > lastTime - 30 * 24 * 60 * 60);
-    case MaxTime.Year:
-      return dataCopy.filter((d) => d.time > lastTime - 365 * 24 * 60 * 60);
-    case MaxTime.All:
-      return dataCopy;
-  }
 }
 
 const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
@@ -77,7 +51,10 @@ const PlaceGraphComponent: React.FC<PlaceGraphProps> = (props) => {
       width={props.width}
       ratio={props.ratio}
       margin={{ left: 30, right: 30, top: 10, bottom: 30 }}
-      data={cropData(data, props.maxTime, data[data.length - 1].time)}
+      data={smoothData(
+        cropData(data, props.maxTime, data[data.length - 1].time),
+        600,
+      )}
       seriesName="Place Data"
       xScale={scaleTime()}
       xAccessor={xAccessor}
@@ -122,7 +99,7 @@ const Graph: React.FC<GraphProps> = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const [placeSelected, setPlaceSelected] = useState<Array<string>>(['fuera']);
+  const [placeSelected, setPlaceSelected] = useState<Array<string>>([]);
   const [maxTime, setMaxTime] = useState<MaxTime>(MaxTime.Day);
 
   useEffect(() => {
@@ -147,7 +124,13 @@ const Graph: React.FC<GraphProps> = () => {
             'layoutButton' +
             (placeSelected.includes('fuera') ? ' selected' : '')
           }
-          onClick={() => setPlaceSelected(['fuera'])}
+          onClick={() => {
+            if (placeSelected.includes('fuera')) {
+              setPlaceSelected(placeSelected.filter((p) => p !== 'fuera'));
+            } else {
+              setPlaceSelected([...placeSelected, 'fuera']);
+            }
+          }}
         >
           <p>Fuera</p>
         </button>
@@ -156,7 +139,13 @@ const Graph: React.FC<GraphProps> = () => {
             'layoutButton' +
             (placeSelected.includes('dentro') ? ' selected' : '')
           }
-          onClick={() => setPlaceSelected(['dentro'])}
+          onClick={() => {
+            if (placeSelected.includes('dentro')) {
+              setPlaceSelected(placeSelected.filter((p) => p !== 'dentro'));
+            } else {
+              setPlaceSelected([...placeSelected, 'dentro']);
+            }
+          }}
         >
           <p>Dentro</p>
         </button>

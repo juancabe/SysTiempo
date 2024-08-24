@@ -8,6 +8,7 @@ import PopupSettings from './components/PopupSettings';
 
 import settingsSvg from './assets/settings.svg';
 import xSettingsSvg from './assets/x.svg';
+import iconPng from '../src-tauri/icons/32x32.png';
 
 enum ButSel {
   None,
@@ -20,7 +21,6 @@ export default function App() {
   const [butSelState, setButSelState] = useState<ButSel>(ButSel.None);
   const [settingsShown, setSettingsShown] = useState<boolean>(false);
 
-  useEffect(() => {}, [settingsShown]);
   return (
     <>
       <div className="containerLayout p-4">
@@ -31,7 +31,7 @@ export default function App() {
             onClick={() => setSettingsShown(!settingsShown)}
           >
             {settingsShown ? (
-              <img src={xSettingsSvg} alt="settings" className={'settings'} />
+              <img src={xSettingsSvg} alt="settings" className={'settingss'} />
             ) : (
               <img src={settingsSvg} alt="settings" className={'settings'} />
             )}
@@ -71,11 +71,7 @@ export default function App() {
               <h1 className="heading">Graph</h1>
             </button>
           </div>
-          <img
-            src={settingsSvg}
-            alt="settings"
-            className="invisible w-10 h-10"
-          />
+          <img src={iconPng} alt="icon" className="settings" />
         </div>
         <div>
           <RealTime />

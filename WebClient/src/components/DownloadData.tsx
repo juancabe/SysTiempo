@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { getSaveEspData } from '../utils/dbAPI';
-import { getEspURLFromPlaceName } from '../utils/getEsp';
+import React, { useState, useEffect } from 'react';
+import { getSaveEspData, getLastTime } from '../utils/dbAPI';
 
 interface DownloadDataProps {
   // define your props here
@@ -9,13 +8,28 @@ interface DownloadDataProps {
 const DownloadData: React.FC<DownloadDataProps> = () => {
   const [fueraState, setFueraState] = useState<string>('No data downloaded');
   const [dentroState, setDentroState] = useState<string>('No data downloaded');
-  const [urlsState, setUrlsState] = useState<(string | null)[]>([]);
+
+  useEffect(() => {
+    const fn = async () => {
+      let lastTime = await getLastTime('fuera');
+      setFueraState(
+        ~~((Date.now() - lastTime * 1000) / 1000 / 60) +
+          ' minute(s) since last download',
+      );
+      lastTime = await getLastTime('dentro');
+      setDentroState(
+        ~~((Date.now() - lastTime * 1000) / 1000 / 60) +
+          ' minute(s) since last download',
+      );
+    };
+    fn();
+  });
 
   return (
     <div className="flex flex-col">
       <div className="text-center p-10">
         <div className="flex justify-center p-2">
-          <p className="border-b">Fuera: {fueraState}</p>
+          <p className="border-b"> Fuera: {fueraState}</p>
         </div>
         <div className="flex justify-center">
           <p className="border-b">Dentro: {dentroState}</p>
@@ -26,13 +40,6 @@ const DownloadData: React.FC<DownloadDataProps> = () => {
           <p
             className="text-xl"
             onClick={async () => {
-              const res = await getEspURLFromPlaceName(['fuera', 'dentro']);
-
-              if (res[0] !== null || res[1] !== null) {
-                console.log('URLs: ' + res);
-                setUrlsState(res);
-              }
-
               try {
                 setDentroState(await getSaveEspData('dentro'));
               } catch (e) {

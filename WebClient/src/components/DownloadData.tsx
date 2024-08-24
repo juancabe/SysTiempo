@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getSaveEspData } from '../utils/dbAPI';
+import { getEspURLFromPlaceName } from '../utils/getEsp';
 
 interface DownloadDataProps {
   // define your props here
@@ -8,6 +9,7 @@ interface DownloadDataProps {
 const DownloadData: React.FC<DownloadDataProps> = () => {
   const [fueraState, setFueraState] = useState<string>('No data downloaded');
   const [dentroState, setDentroState] = useState<string>('No data downloaded');
+  const [urlsState, setUrlsState] = useState<(string | null)[]>([]);
 
   return (
     <div className="flex flex-col">
@@ -24,6 +26,13 @@ const DownloadData: React.FC<DownloadDataProps> = () => {
           <p
             className="text-xl"
             onClick={async () => {
+              const res = await getEspURLFromPlaceName(['fuera', 'dentro']);
+
+              if (res[0] !== null || res[1] !== null) {
+                console.log('URLs: ' + res);
+                setUrlsState(res);
+              }
+
               try {
                 setDentroState(await getSaveEspData('dentro'));
               } catch (e) {

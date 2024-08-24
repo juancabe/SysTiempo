@@ -155,3 +155,42 @@ async function getEspDataFromIndex(
     return null;
   }
 }
+
+export async function getEspURLFromPlaceName(
+  placeNames: string[],
+): Promise<(string | null)[]> {
+  const localUrl: string = 'http://192.168.1.';
+  const client: Client = await getClient();
+
+  let returnUrls: (string | null)[] = [null];
+
+  console.log('hey hey');
+
+  const doRequest = async (ip: number): Promise<boolean> => {
+    console.log('Promise ' + ip + ' doing things');
+    try {
+      const response = await client.get(localUrl + ip, {
+        timeout: 30,
+        responseType: ResponseType.Text,
+      });
+      const stringResponse = response.data as string;
+      for (let i = 0; i < placeNames.length; i++) {
+        if (stringResponse.includes(placeNames[i]))
+          returnUrls[i] = localUrl + ip;
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  let promises: Promise<boolean>[] = [];
+
+  for (let i = 0; i < 256; i++) {
+    promises.push(doRequest(i));
+  }
+
+  await Promise.all(promises);
+
+  return returnUrls;
+}

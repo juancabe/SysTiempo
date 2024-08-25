@@ -8,9 +8,12 @@ interface DownloadDataProps {
 const DownloadData: React.FC<DownloadDataProps> = () => {
   const [fueraState, setFueraState] = useState<string>('No data downloaded');
   const [dentroState, setDentroState] = useState<string>('No data downloaded');
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const fn = async () => {
+      count;
+      console.log('Thing triggered!!!!!!!!!!!!!!!');
       let lastTime = await getLastTime('fuera');
       setFueraState(
         ~~((Date.now() - lastTime * 1000) / 1000 / 60) +
@@ -23,7 +26,13 @@ const DownloadData: React.FC<DownloadDataProps> = () => {
       );
     };
     fn();
-  });
+    const interval = setInterval(() => {
+      console.log('This will run every 30 seconds');
+      setCount((prevCount) => prevCount + 1);
+      fn();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -39,17 +48,11 @@ const DownloadData: React.FC<DownloadDataProps> = () => {
         <button className="layoutButton">
           <p
             className="text-xl"
-            onClick={async () => {
-              try {
-                setDentroState(await getSaveEspData('dentro'));
-              } catch (e) {
-                console.error(e);
-              }
-              try {
-                setFueraState(await getSaveEspData('fuera'));
-              } catch (e) {
-                console.error(e);
-              }
+            onClick={() => {
+              setDentroState('Downloading data');
+              setFueraState('Downloading data');
+              getSaveEspData('dentro', setDentroState);
+              getSaveEspData('fuera', setFueraState);
             }}
           >
             Click to download Data

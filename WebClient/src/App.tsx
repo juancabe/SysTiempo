@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import DownloadData from './components/DownloadData';
 import Import from './components/Import';
@@ -6,8 +6,8 @@ import Graph from './components/Graph';
 import RealTime from './components/RealTime';
 import PopupSettings from './components/PopupSettings';
 
-import settingsSvg from './assets/settings.svg';
-import xSettingsSvg from './assets/x.svg';
+import settingsSvg from './assets/settings-blue.svg';
+import xSettingsSvg from './assets/x-blue.svg';
 import iconPng from '../src-tauri/icons/32x32.png';
 
 enum ButSel {
@@ -30,11 +30,11 @@ export default function App() {
             className="text-black"
             onClick={() => setSettingsShown(!settingsShown)}
           >
-            {settingsShown ? (
-              <img src={xSettingsSvg} alt="settings" className={'settingss'} />
-            ) : (
-              <img src={settingsSvg} alt="settings" className={'settings'} />
-            )}
+            <img
+              src={settingsShown ? xSettingsSvg : settingsSvg}
+              alt="settings"
+              className={'settings'}
+            />
           </div>
 
           <div className="inner-containerLayout">
@@ -71,7 +71,7 @@ export default function App() {
               <h1 className="heading">Graph</h1>
             </button>
           </div>
-          <img src={iconPng} alt="icon" className="settings" />
+          <img src={iconPng} alt="icon" className="icon" />
         </div>
         <div>
           <RealTime />

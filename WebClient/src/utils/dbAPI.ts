@@ -121,9 +121,15 @@ export function getURLFromPlaceName(placeName: string): Promise<string | null> {
   });
 }
 
-export function getSaveEspData(placeName: string): Promise<string> {
-  return new Promise<string>((resolve) => {
+export async function getSaveEspData(
+  placeName: string,
+  setFn: (value: React.SetStateAction<string>) => void,
+) {
+  const res = await new Promise<string>((resolve) => {
     const dbErrFunct = () => {
+      setFn(() => {
+        return 'Failed to save data.';
+      });
       resolve('Failed to save data.');
       return;
     };
@@ -178,6 +184,7 @@ export function getSaveEspData(placeName: string): Promise<string> {
       }
     };
   });
+  setFn(res);
 }
 
 export function saveToDBEspData(data: EspData[], storeName: string): void {

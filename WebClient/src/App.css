@@ -9,6 +9,7 @@
 
 .inner-containerLayout {
   @apply flex py-5 justify-center;
+  flex-flow: wrap;
 }
 
 .layoutButton {

@@ -13,7 +13,6 @@ const DownloadData: React.FC<DownloadDataProps> = () => {
   useEffect(() => {
     const fn = async () => {
       count;
-      console.log('Thing triggered!!!!!!!!!!!!!!!');
       let lastTime = await getLastTime('fuera');
       setFueraState(
         ~~((Date.now() - lastTime * 1000) / 1000 / 60) +
